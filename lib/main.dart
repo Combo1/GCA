@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gca/MainMenuScreen.dart';
 import 'package:gca/TicTacToeScreen.dart';
+
+import 'ConnectFourScreen.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,8 +28,10 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         TicTacToeScreen.routeName: (context) => TicTacToeScreen(),
+        MainMenuScreen.routeName: (context) => MainMenuScreen(),
+        ConnectFourScreen.routeName: (context) => ConnectFourScreen(),
       },
-      initialRoute: TicTacToeScreen.routeName,
+      initialRoute: MainMenuScreen.routeName,
     );
   }
 }

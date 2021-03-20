@@ -14,5 +14,4 @@ class TicTacToeScreen extends StatelessWidget{
       ),
     );
   }
-
 }
