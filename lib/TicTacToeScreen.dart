@@ -1,6 +1,247 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:tuple/tuple.dart';
+
+
+//------------------------ ParentWidget --------------------------------
+class BoardWidget extends StatefulWidget {
+  @override
+  _BoardWidgetState createState() => _BoardWidgetState();
+}
+
+class _BoardWidgetState extends State<BoardWidget> {
+  //bool _active = false;
+  var _board = List.generate(
+      3, (i) => List.generate(3, (j) => 0, growable: false),
+      growable: false);
+  int _state = 0;
+  int _round = 0;
+
+  void _handleTapboxChanged(Tuple2<int, int> position) {
+    setState(() {
+      if (_board[position.item1][position.item2] == 0 && _state < 2) {
+        _board[position.item1][position.item2] = _state + 1;
+        bool end = false;
+        _round++;
+        for (int i = 0; i < 3; i++) {
+          if (_board[i][1] != 0 &&
+              _board[i][0] == _board[i][1] &&
+              _board[i][1] == _board[i][2]) {
+            end = true;
+            _state = _board[i][0] + 1;
+            break;
+          } else if (_board[1][i] != 0 &&
+              _board[0][i] == _board[1][i] &&
+              _board[1][i] == _board[2][i]) {
+            end = true;
+            _state = _board[0][i] + 1;
+            break;
+          }
+        }
+        if (!end) {
+          if (_board[1][1] != 0 &&
+              ((_board[0][0] == _board[1][1] && _board[1][1] == _board[2][2]) ||
+                  (_board[0][2] == _board[1][1] &&
+                      _board[1][1] == _board[2][0]))) {
+            _state = _board[1][1] + 1;
+          } else {
+            _state = (_round < 9) ? (_state + 1) % 2 : 4;
+          }
+        }
+      }
+    });
+  }
+
+  void _restart(int state) {
+    setState(() {
+      if (_state > 1) {
+        _state = 0;
+        _round = 0;
+        for (int x = 0; x < 3; x++) {
+          for (int y = 0; y < 3; y++) {
+            _board[x][y] = 0;
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      GameState(state: _state, onChanged: _restart),
+      Container(
+          child: Column(children: [
+            Row(children: [
+              Tapbox(
+                active: _board[0][0],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(0, 0),
+              ),
+              Tapbox(
+                active: _board[0][1],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(0, 1),
+              ),
+              Tapbox(
+                active: _board[0][2],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(0, 2),
+              ),
+            ]),
+            Row(children: [
+              Tapbox(
+                active: _board[1][0],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(1, 0),
+              ),
+              Tapbox(
+                active: _board[1][1],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(1, 1),
+              ),
+              Tapbox(
+                active: _board[1][2],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(1, 2),
+              ),
+            ]),
+            Row(children: [
+              Tapbox(
+                active: _board[2][0],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(2, 0),
+              ),
+              Tapbox(
+                active: _board[2][1],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(2, 1),
+              ),
+              Tapbox(
+                active: _board[2][2],
+                onChanged: _handleTapboxChanged,
+                position: Tuple2<int, int>(2, 2),
+              ),
+            ]),
+          ]),
+          decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Colors.black),
+                right: BorderSide(color: Colors.black),
+              )))
+    ]);
+  }
+}
+
+//------------------------- TapboxB ----------------------------------
+
+class Tapbox extends StatelessWidget {
+  Tapbox(
+      {Key key,
+        this.active: 0,
+        @required this.onChanged,
+        @required this.position})
+      : super(key: key);
+
+  final int active;
+  final ValueChanged<Tuple2<int, int>> onChanged;
+  final Tuple2<int, int> position;
+
+  void _handleTap() {
+    onChanged(position);
+  }
+
+  String _buttonText() {
+    if (active == 0) {
+      return "";
+    } else if (active == 1) {
+      return "O";
+    } else {
+      return "X";
+    }
+  }
+
+  Color _buttonColour() {
+    if (active == 0) {
+      return Colors.white;
+    } else if (active == 1) {
+      return Colors.lightGreen[700];
+    } else {
+      return Colors.red;
+    }
+  }
+
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: _handleTap,
+        child: AspectRatio(
+          aspectRatio: 1 / 1,
+          child: Container(
+            child: Center(
+              child: Text(
+                _buttonText(),
+                style: TextStyle(fontSize: 32.0, color: Colors.black),
+              ),
+            ),
+            decoration: BoxDecoration(
+                color: _buttonColour(),
+                border: Border(
+                  top: BorderSide(color: Colors.black),
+                  left: BorderSide(color: Colors.black),
+                )),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GameState extends StatelessWidget {
+  GameState({Key key, this.state: 0, @required this.onChanged})
+      : super(key: key);
+
+  final int state;
+  final ValueChanged<int> onChanged;
+
+  void _handleTap() {
+    onChanged(state);
+  }
+
+  String _message() {
+    switch (state) {
+      case 0:
+        return "Turn of Player O";
+      case 1:
+        return "Turn of Player X";
+      case 2:
+        return "Player O wins! Restart?";
+      case 3:
+        return "Player X wins! Restart?";
+      case 4:
+        return "Draw! Restart?";
+    }
+  }
+
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: _handleTap,
+        child: Container(
+          child: Center(
+            child: Text(
+              _message(),
+              style: TextStyle(fontSize: 32.0, color: Colors.black),
+            ),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 class TicTacToeScreen extends StatelessWidget{
   static const routeName = '/games/tictactoe';
@@ -8,9 +249,15 @@ class TicTacToeScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child:
-        Scaffold(
-          body: new Text('TODO TicTacToe'),
+    return MaterialApp(
+      title: 'Tic Tac Toe',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Tic Tac Toe'),
+        ),
+        body: Center(
+          child: BoardWidget(),
+        ),
       ),
     );
   }
