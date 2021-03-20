@@ -243,9 +243,58 @@ class GameState extends StatelessWidget {
 }
 
 
+
+class TicTacToePVPScreen extends StatelessWidget{
+  static const routeName = '/games/tictactoe/PVP';
+
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tic Tac Toe PVP',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Tic Tac Toe PVP'),
+        ),
+        body: Center(
+          child: BoardWidget(),
+        ),
+      ),
+    );
+  }
+}
+
+class TicTacToePVCScreen extends StatelessWidget{
+  static const routeName = '/games/tictactoe/PVC';
+
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tic Tac Toe Computer',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Tic Tac Toe Computer'),
+        ),
+        body: Center(
+          child: BoardWidget(),
+        ),
+      ),
+    );
+  }
+}
+
 class TicTacToeScreen extends StatelessWidget{
   static const routeName = '/games/tictactoe';
 
+
+  void onTicTacToePVPPressed(BuildContext context){
+    Navigator.pushNamed(context, TicTacToePVPScreen.routeName);
+  }
+
+  void onTicTacToePVCPressed(BuildContext context){
+    Navigator.pushNamed(context, TicTacToePVCScreen.routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +305,13 @@ class TicTacToeScreen extends StatelessWidget{
           title: Text('Tic Tac Toe'),
         ),
         body: Center(
-          child: BoardWidget(),
+          child: ListView(
+            children: [
+              ElevatedButton(child: Center(child: Text('PVP')), onPressed: () => this.onTicTacToePVPPressed(context), ),
+              Divider(),
+              ElevatedButton(child: Center(child: Text('Computer')), onPressed: () => this.onTicTacToePVCPressed(context), ),
+            ],
+          ),
         ),
       ),
     );
