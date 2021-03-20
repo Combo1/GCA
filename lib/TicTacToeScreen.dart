@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
+import 'dart:math';
 
 
 //------------------------ ParentWidget --------------------------------
@@ -19,8 +20,9 @@ class _BoardWidgetState extends State<BoardWidget> {
       growable: false);
   int _state = 0;
   int _round = 0;
+  Random _random = new Random();
 
-  void _handleTapboxChanged(Tuple2<int, int> position) {
+  bool _handleSelection(Tuple2<int, int> position) {
     setState(() {
       if (_board[position.item1][position.item2] == 0 && _state < 2) {
         _board[position.item1][position.item2] = _state + 1;
@@ -53,6 +55,13 @@ class _BoardWidgetState extends State<BoardWidget> {
         }
       }
     });
+    return _state < 2;
+  }
+
+  void _handleTapboxChanged(Tuple2<int, int> position) {
+    if(_handleSelection(position) && bot) {
+      while (!_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3)))) {}
+    }
   }
 
   void _restart(int state) {
