@@ -4,11 +4,15 @@ import 'package:tuple/tuple.dart';
 
 //------------------------ ParentWidget --------------------------------
 class BoardWidget extends StatefulWidget {
+  BoardWidget(this.bot);
+  final bool bot;
   @override
-  _BoardWidgetState createState() => _BoardWidgetState();
+  _BoardWidgetState createState() => _BoardWidgetState(bot);
 }
 
 class _BoardWidgetState extends State<BoardWidget> {
+  _BoardWidgetState(this.bot);
+  final bool bot;
   //bool _active = false;
   var _board = List.generate(
       3, (i) => List.generate(3, (j) => 0, growable: false),
@@ -257,7 +261,7 @@ class TicTacToePVPScreen extends StatelessWidget{
           title: Text('Tic Tac Toe PVP'),
         ),
         body: Center(
-          child: BoardWidget(),
+          child: BoardWidget(false),
         ),
       ),
     );
@@ -277,7 +281,7 @@ class TicTacToePVCScreen extends StatelessWidget{
           title: Text('Tic Tac Toe Computer'),
         ),
         body: Center(
-          child: BoardWidget(),
+          child: BoardWidget(true),
         ),
       ),
     );
