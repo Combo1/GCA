@@ -23,8 +23,8 @@ class _BoardWidgetState extends State<BoardWidget> {
   Random _random = new Random();
 
   bool _handleSelection(Tuple2<int, int> position) {
-    setState(() {
-      if (_board[position.item1][position.item2] == 0 && _state < 2) {
+    if (_board[position.item1][position.item2] == 0 && _state < 2) {
+      setState(() {
         _board[position.item1][position.item2] = _state + 1;
         bool end = false;
         _round++;
@@ -53,9 +53,12 @@ class _BoardWidgetState extends State<BoardWidget> {
             _state = (_round < 9) ? (_state + 1) % 2 : 4;
           }
         }
-      }
-    });
-    return _state < 2;
+      });
+      return _state < 2;
+    } else {
+      return false;
+    }
+
   }
 
   void _handleTapboxChanged(Tuple2<int, int> position) {
