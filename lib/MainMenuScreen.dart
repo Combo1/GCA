@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gca/ConnectFourScreen.dart';
 import 'package:gca/TicTacToeScreen.dart';
 
+import 'ReactionGameScreen.dart';
+
 class MainMenuScreen extends StatelessWidget{
   static const routeName = '/';
 
@@ -14,6 +16,8 @@ class MainMenuScreen extends StatelessWidget{
           ElevatedButton(child: Center(child: Text('Tic Tac Toe')), onPressed: () => this.onTicTacToePressed(context), ),
           Divider(),
           ElevatedButton(child: Center(child: Text('Connect Four')), onPressed: () => this.onConnectFourPressed(context), ),
+          Divider(),
+          ElevatedButton(child: Center(child: Text('Reaction Game')), onPressed: () => this.onF1GamePressed(context), ),
         ],
       )
     );
@@ -26,6 +30,10 @@ class MainMenuScreen extends StatelessWidget{
 
   void onConnectFourPressed(BuildContext context){
     Navigator.pushNamed(context, ConnectFourScreen.routeName);
+  }
+
+  void onF1GamePressed(BuildContext context){
+    Navigator.pushNamed(context, ReactionGameScreen.routeName);
   }
 
 }
