@@ -35,7 +35,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
   int _counterSolved;
   int _pointsForSolving;
   //game info
-  static const int gameDuration = 20;
+  static const int gameDuration = 30;
   bool _isGameRunning = false;
 
 
@@ -111,7 +111,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
     List<Color> colors = <Color>[Colors.black, Colors.white, Colors.red, Colors.blue, Colors.green, Colors.yellow, Colors.orange, Colors.purple[400], ];
     List<String> colorText = <String>['Black', 'White', 'Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple',];
 
-    int firstIndex = 7;//_random.nextInt(colors.length);
+    int firstIndex = _random.nextInt(colors.length);
 
 
     int secondIndex = _random.nextInt(colors.length);
@@ -139,7 +139,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
   }
 
   void retryGame(){
-    print('here');
+    //print('here');
     setState(() {
       this.initGame();
     });
@@ -215,8 +215,6 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
               padding: EdgeInsets.only(top: 30,),
               child:
                 _buildGameContent(context),
-
-
             ),
             ),
             ),
