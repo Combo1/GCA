@@ -33,17 +33,151 @@ class _HomeState extends State<Home> {
     AssetImage circle = AssetImage("images/circle.png");
     AssetImage edit = AssetImage("images/edit.png");
 
+
+    bool checkWin(row, column, myturn) {
+      //row: Column of last placed token
+      //Column: Row of last placed token
+      //player: 0 or 1 depended on which played placed the last token
+      int player = myturn? 0 : 1;
+      int count = 0;
+
+      //Vertical Check
+
+      for(int i = 0; i < 6; i++) {
+        if(list1[row][i] == player) {
+          count++;
+        } else {
+          count=0;
+        }
+        if(count>= 4) {
+          return true;
+        }
+      }
+
+
+      count = 0;
+      //Horizontal Check
+      for(int i = 0; i < 7 ; i++) {
+        if(list1[i][column] == player) {
+          count++;
+        } else {
+          count = 0;
+        }
+
+        if(count>= 4) {
+          return true;
+        }
+      }
+      count = 0;
+
+      //Top-left to Bottom-right
+
+      for(int i = 1; i < 4; i++) {
+        count = 0;
+        for(int r = i, c = 0; r < 7 && c < 6; r++, c++) {
+          if(list1[r][c] == player) {
+            count++;
+            if(count >= 4) {
+              return true;
+            }
+          }
+          else {
+            count = 0;
+          }
+        }
+      }
+      for(int i = 0; i < 3; i++) {
+        count = 0;
+        for(int r = 0, c = i; r < 7 && c < 6; r++, c++) {
+          if(list1[r][c] == player) {
+            count++;
+            if (count >= 4) {
+              return true;
+            }
+          }
+          else {
+            count = 0;
+          }
+        }
+      }
+
+      //Left-Bottom to Top-Right
+      for(int i = 3; i < 6; i++) {
+        count = 0;
+        for(int r = 0, c = i; r < 7 && c > -1; r++, c--) {
+          if(list1[r][c] == player) {
+            count++;
+            if(count >= 4) {
+              return true;
+            }
+          } else {
+            count = 0;
+          }
+        }
+      }
+
+      for(int i = 1; i < 4; i++) {
+        count = 0;
+        for(int r = i, c = 5; r < 7 && c > -1; r++, c--) {
+          if(list1[r][c] == player) {
+            count++;
+            if(count >= 4) {
+              return true;
+            }
+          } else {
+            count = 0;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    //column = 0 = top
+    //row = 0 = left
+    int findFirstEmptyRow(row) {
+      for(int i = 5; i > -1; i--) {
+        if(list1[row][i] == -1) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
     void playGame(int row, int column) {
       if(this.list1[row][column] == -1) {
         setState(() {
           if(myturn) {
-            list1[row][column] = 0;
+            //print(row);
+            //print(column);
+            list1[row][findFirstEmptyRow(row)] = 0;
           } else {
-            list1[row][column] = 1;
+            list1[row][findFirstEmptyRow(row)] = 1;
           }
-          myturn = !myturn;
         });
       }
+    }
+
+    _showDialog(winner) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Player won!'),
+            actions:<Widget> [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      list1 = [[-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1]];
+                    });
+                  },
+                  child: Text('Reset Game'),
+              ),
+            ]
+          );
+        }
+      );
     }
 
     IconButton get_Icon(state, row, column) {
@@ -53,6 +187,10 @@ class _HomeState extends State<Home> {
               iconSize: 25,
               icon: Icon(Icons.add_circle_outline), onPressed: () {
             playGame(row, column);
+            if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
+              _showDialog(myturn);
+            }
+            myturn = !myturn;
           }
           );
         }
@@ -89,9 +227,6 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      /*Card(
-              child: Text("It is player " + myturn.toString() + " turn."),
-          ), */
                       Column(
                           children: <Widget> [get_Icon(list1[0][0], 0, 0),
                             get_Icon(list1[0][1], 0, 1),
