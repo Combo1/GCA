@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
 import 'dart:math';
 
-
 //------------------------ ParentWidget --------------------------------
 class BoardWidget extends StatefulWidget {
   BoardWidget(this.bot);
+
   final bool bot;
+
   @override
   _BoardWidgetState createState() => _BoardWidgetState(bot);
 }
 
 class _BoardWidgetState extends State<BoardWidget> {
   _BoardWidgetState(this.bot);
+
   final bool bot;
+
   //bool _active = false;
   var _board = List.generate(
       3, (i) => List.generate(3, (j) => 0, growable: false),
@@ -22,11 +25,11 @@ class _BoardWidgetState extends State<BoardWidget> {
   int _round = 0;
   Random _random = new Random();
 
-  bool _handleSelection(Tuple2<int, int> position) {
+  int _handleSelection(Tuple2<int, int> position) {
     if (_board[position.item1][position.item2] == 0 && _state < 2) {
+      bool end = false;
       setState(() {
         _board[position.item1][position.item2] = _state + 1;
-        bool end = false;
         _round++;
         for (int i = 0; i < 3; i++) {
           if (_board[i][1] != 0 &&
@@ -54,16 +57,13 @@ class _BoardWidgetState extends State<BoardWidget> {
           }
         }
       });
-      return _state < 2;
-    } else {
-      return false;
     }
-
+    return _state;
   }
 
   void _handleTapboxChanged(Tuple2<int, int> position) {
-    if(_handleSelection(position) && bot) {
-      while (!_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3)))) {}
+    if (_handleSelection(position) == 1 && bot) {
+      while (_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
     }
   }
 
@@ -141,9 +141,9 @@ class _BoardWidgetState extends State<BoardWidget> {
           ]),
           decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.black),
-                right: BorderSide(color: Colors.black),
-              )))
+            bottom: BorderSide(color: Colors.black),
+            right: BorderSide(color: Colors.black),
+          )))
     ]);
   }
 }
@@ -153,9 +153,9 @@ class _BoardWidgetState extends State<BoardWidget> {
 class Tapbox extends StatelessWidget {
   Tapbox(
       {Key key,
-        this.active: 0,
-        @required this.onChanged,
-        @required this.position})
+      this.active: 0,
+      @required this.onChanged,
+      @required this.position})
       : super(key: key);
 
   final int active;
@@ -258,11 +258,8 @@ class GameState extends StatelessWidget {
   }
 }
 
-
-
-class TicTacToePVPScreen extends StatelessWidget{
+class TicTacToePVPScreen extends StatelessWidget {
   static const routeName = '/games/tictactoe/PVP';
-
 
   @override
   Widget build(BuildContext context) {
@@ -280,9 +277,8 @@ class TicTacToePVPScreen extends StatelessWidget{
   }
 }
 
-class TicTacToePVCScreen extends StatelessWidget{
+class TicTacToePVCScreen extends StatelessWidget {
   static const routeName = '/games/tictactoe/PVC';
-
 
   @override
   Widget build(BuildContext context) {
@@ -300,15 +296,14 @@ class TicTacToePVCScreen extends StatelessWidget{
   }
 }
 
-class TicTacToeScreen extends StatelessWidget{
+class TicTacToeScreen extends StatelessWidget {
   static const routeName = '/games/tictactoe';
 
-
-  void onTicTacToePVPPressed(BuildContext context){
+  void onTicTacToePVPPressed(BuildContext context) {
     Navigator.pushNamed(context, TicTacToePVPScreen.routeName);
   }
 
-  void onTicTacToePVCPressed(BuildContext context){
+  void onTicTacToePVCPressed(BuildContext context) {
     Navigator.pushNamed(context, TicTacToePVCScreen.routeName);
   }
 
@@ -323,9 +318,15 @@ class TicTacToeScreen extends StatelessWidget{
         body: Center(
           child: ListView(
             children: [
-              ElevatedButton(child: Center(child: Text('PVP')), onPressed: () => this.onTicTacToePVPPressed(context), ),
+              ElevatedButton(
+                child: Center(child: Text('PVP')),
+                onPressed: () => this.onTicTacToePVPPressed(context),
+              ),
               Divider(),
-              ElevatedButton(child: Center(child: Text('Computer')), onPressed: () => this.onTicTacToePVCPressed(context), ),
+              ElevatedButton(
+                child: Center(child: Text('Computer')),
+                onPressed: () => this.onTicTacToePVCPressed(context),
+              ),
             ],
           ),
         ),
