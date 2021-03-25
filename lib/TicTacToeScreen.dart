@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
 import 'dart:math';
+import 'dart:io';
 
 //------------------------ ParentWidget --------------------------------
 class BoardWidget extends StatefulWidget {
@@ -63,7 +64,9 @@ class _BoardWidgetState extends State<BoardWidget> {
 
   void _handleTapboxChanged(Tuple2<int, int> position) {
     if (_handleSelection(position) == 1 && bot) {
-      while (_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
+      Future.delayed(const Duration(milliseconds: 200), () {
+        while (_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
+      });
     }
   }
 
