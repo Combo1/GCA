@@ -18,6 +18,50 @@ class _BoardWidgetState extends State<BoardWidget> {
 
   final bool bot;
 
+  String _message() {
+    switch (_state) {
+      case 0:
+      case 1:
+        return "";
+      case 2:
+        return "Player O wins!";
+      case 3:
+        return "Player X wins!";
+      case 4:
+        return "Draw!";
+    }
+  }
+
+  void _showEndDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Game Over"),
+          content: new Text(_message()),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("Restart"),
+              onPressed: () {
+                _restart(_state);
+                Navigator.of(context).pop();
+              },
+            ),
+            new TextButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   //bool _active = false;
   var _board = List.generate(
       3, (i) => List.generate(3, (j) => 0, growable: false),
@@ -68,6 +112,7 @@ class _BoardWidgetState extends State<BoardWidget> {
         while (_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
       });
     }
+    if (_state > 1) _showEndDialog();
   }
 
   void _restart(int state) {
