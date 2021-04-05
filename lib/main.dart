@@ -32,15 +32,46 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         MainMenuScreen.routeName: (context) => MainMenuScreen(),
-        ConnectFourScreen.routeName: (context) => ConnectFourScreen(),
-	ConnectFourPVCScreen.routeName: (context) => ConnectFourPVCScreen(),
-        ConnectFourPVPScreen.routeName: (context) => ConnectFourPVPScreen(),
-        ReactionGameScreen.routeName: (context) => ReactionGameScreen(4),
-        F1ReactionGameStartScreen.routeName: (context) => F1ReactionGameStartScreen(),
       },
       initialRoute: MainMenuScreen.routeName,
       onGenerateRoute: (settings) {
         switch (settings.name) {
+          case ConnectFourScreen.routeName:
+            return PageTransition(
+              child: ReactionGameScreen(4),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
+            break;
+          case ConnectFourScreen.routeName:
+            return PageTransition(
+              child: ConnectFourScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
+            break;
+          case ConnectFourPVCScreen.routeName:
+            return PageTransition(
+              child: ConnectFourPVCScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
+            break;
+          case ConnectFourPVCScreen.routeName:
+            return PageTransition(
+              child: ConnectFourPVPScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
+            break;
           case TicTacToeScreen.routeName:
             return PageTransition(
               child: TicTacToeScreen(),
