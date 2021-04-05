@@ -5,7 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 
 
 class ConnectFourScreen extends StatelessWidget{
-  static const routeName = '/games/tictactoe';
+  static const routeName = '/games/connectfour';
 
 
   void onTicTacToePVPPressed(BuildContext context){
@@ -19,10 +19,10 @@ class ConnectFourScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tic Tac Toe',
+      title: 'Connect Four',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Tic Tac Toe'),
+          title: Text('Connect Four'),
         ),
         body: Center(
           child: ListView(
@@ -232,6 +232,41 @@ class _HomeState extends State<Home> {
       );
     }
 
+    /*
+    bool checkDraw() {
+      for(int i = 0; i < list1.length; i++) {
+        for(int j = 0; j < list1[i].length; i++) {
+          //If any field is not filled then the game is not over
+          if(list1[j][i] != -1) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    _showDraw(){
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: Text('Draw!'),
+                actions:<Widget> [
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        list1 = [[-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1]];
+                      });
+                    },
+                    child: Text('Reset Game'),
+                  ),
+                ]
+            );
+          }
+      );
+    }
+    */
 
 
 
