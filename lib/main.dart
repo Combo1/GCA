@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gca/F1ReactionGameScreen.dart';
 import 'package:gca/MainMenuScreen.dart';
+import 'package:gca/RockPaperScissors.dart';
 import 'package:gca/TicTacToeScreen.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -43,17 +44,8 @@ class MyApp extends StatelessWidget {
               child: TicTacToeScreen(),
               type: PageTransitionType.fade,
               settings: settings,
-              duration: Duration(milliseconds: 500),
-              reverseDuration: Duration(milliseconds: 500),
-            );
-            break;
-          case TicTacToePVCScreen.routeName:
-            return PageTransition(
-              child: TicTacToePVCScreen(),
-              type: PageTransitionType.fade,
-              settings: settings,
-              duration: Duration(milliseconds: 500),
-              reverseDuration: Duration(milliseconds: 500),
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
             );
             break;
           case TicTacToePVPScreen.routeName:
@@ -61,8 +53,35 @@ class MyApp extends StatelessWidget {
               child: TicTacToePVPScreen(),
               type: PageTransitionType.fade,
               settings: settings,
-              duration: Duration(milliseconds: 500),
-              reverseDuration: Duration(milliseconds: 500),
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
+            break;
+          case TicTacToePVCScreen.routeName:
+            return PageTransition(
+              child: TicTacToePVCScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
+            break;
+          case RPSScreen.routeName:
+            return PageTransition(
+              child: RPSScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
+            break;
+          case RPSStandardScreen.routeName:
+            return PageTransition(
+              child: RPSStandardScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
             );
             break;
           default:
