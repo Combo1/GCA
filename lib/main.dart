@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       initialRoute: MainMenuScreen.routeName,
       onGenerateRoute: (settings) {
         switch (settings.name) {
-          case ConnectFourScreen.routeName:
+          case ReactionGameScreen.routeName:
             return PageTransition(
               child: ReactionGameScreen(4),
               type: PageTransitionType.fade,
