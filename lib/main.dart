@@ -33,6 +33,8 @@ class MyApp extends StatelessWidget {
       routes: {
         MainMenuScreen.routeName: (context) => MainMenuScreen(),
         ConnectFourScreen.routeName: (context) => ConnectFourScreen(),
+	ConnectFourPVCScreen.routeName: (context) => ConnectFourPVCScreen(),
+        ConnectFourPVPScreen.routeName: (context) => ConnectFourPVPScreen(),
         ReactionGameScreen.routeName: (context) => ReactionGameScreen(4),
         F1ReactionGameStartScreen.routeName: (context) => F1ReactionGameStartScreen(),
       },
