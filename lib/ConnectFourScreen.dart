@@ -1,14 +1,64 @@
-
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-class ConnectFourScreen extends StatefulWidget{
-  static const routeName = '/games/connectfour';
+
+
+class ConnectFourScreen extends StatelessWidget{
+  static const routeName = '/games/tictactoe';
+
+
+  void onTicTacToePVPPressed(BuildContext context){
+    Navigator.pushNamed(context, ConnectFourPVPScreen.routeName);
+  }
+
+  void onTicTacToePVCPressed(BuildContext context){
+    Navigator.pushNamed(context, ConnectFourPVCScreen.routeName);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tic Tac Toe',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Tic Tac Toe'),
+        ),
+        body: Center(
+          child: ListView(
+            children: [
+              ElevatedButton(child: Center(child: Text('PVP')), onPressed: () => this.onTicTacToePVPPressed(context), ),
+              Divider(),
+              ElevatedButton(child: Center(child: Text('Computer')), onPressed: () => this.onTicTacToePVCPressed(context), ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ConnectFourPVCScreen extends StatelessWidget{
+  static const routeName = '/games/connectfour/PVC';
+
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Connect Four Computer',
+    );
+  }
+}
+
+
+class ConnectFourPVPScreen extends StatefulWidget{
+  static const routeName = '/games/connectfour/PVP';
 
   @override
   _ConnectFourScreenState createState() => _ConnectFourScreenState();
 }
 
-class _ConnectFourScreenState extends State<ConnectFourScreen> {
+class _ConnectFourScreenState extends State<ConnectFourPVPScreen> {
   @override
   Widget build(BuildContext context) {
     return Home();
@@ -32,6 +82,8 @@ class _HomeState extends State<Home> {
     AssetImage cross = AssetImage("images/cross.png");
     AssetImage circle = AssetImage("images/circle.png");
     AssetImage edit = AssetImage("images/edit.png");
+
+    AudioCache _audioCache = AudioCache(prefix: 'assets/Audio/');
 
 
     bool checkWin(row, column, myturn) {
@@ -163,7 +215,7 @@ class _HomeState extends State<Home> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Player won!'),
+            title: Text('Player ' + (myturn?"red":"blue") + ' won!'),
             actions:<Widget> [
               FlatButton(
                   onPressed: () {
@@ -180,27 +232,31 @@ class _HomeState extends State<Home> {
       );
     }
 
+
+
+
     IconButton get_Icon(state, row, column) {
       switch(state) {
         case -1: {
           return IconButton(
-              iconSize: 25,
+              iconSize: 32,
               icon: Icon(Icons.add_circle_outline), onPressed: () {
-            playGame(row, column);
-            if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
-              _showDialog(myturn);
-            }
-            myturn = !myturn;
-          }
+                _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+                playGame(row, column);
+                if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
+                  _showDialog(myturn);
+                  }
+                myturn = !myturn;
+              }
           );
         }
         break;
         case 0: {
-          return IconButton(iconSize: 25,icon: Icon(Icons.ac_unit), onPressed: () {});
+          return IconButton(iconSize: 32,color: Colors.blue, icon: Icon(Icons.circle), onPressed: () {});
         }
         break;
         case 1: {
-          return IconButton(iconSize: 25,icon: Icon(Icons.access_alarm), onPressed: () {});
+          return IconButton(iconSize: 32, color: Colors.red, icon: Icon(Icons.circle), onPressed: () {});
         }
       }
     }
@@ -217,7 +273,7 @@ class _HomeState extends State<Home> {
 
                 children: <Widget> [
                   Card(margin: EdgeInsets.fromLTRB(16, 16, 16, 16), child: Column(children: <Widget> [
-                    Text("It is player's " + myturn.toString() + " turn.", style: TextStyle(
+                    Text("It is player's " + (myturn?"blue":"red") + " turn.", style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
                     )),
