@@ -109,7 +109,8 @@ class _BoardWidgetState extends State<BoardWidget> {
   void _handleTapboxChanged(Tuple2<int, int> position) {
     if (_handleSelection(position) == 1 && bot) {
       Future.delayed(const Duration(milliseconds: 200), () {
-        while (_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
+        while (_handleSelection(
+            Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
       });
     }
     if (_state > 1) _showEndDialog();
@@ -189,9 +190,9 @@ class _BoardWidgetState extends State<BoardWidget> {
           ]),
           decoration: BoxDecoration(
               border: Border(
-            bottom: BorderSide(color: Colors.black),
-            right: BorderSide(color: Colors.black),
-          )))
+                bottom: BorderSide(color: Colors.black),
+                right: BorderSide(color: Colors.black),
+              )))
     ]);
   }
 }
@@ -199,11 +200,10 @@ class _BoardWidgetState extends State<BoardWidget> {
 //------------------------- TapboxB ----------------------------------
 
 class Tapbox extends StatelessWidget {
-  Tapbox(
-      {Key key,
-      this.active: 0,
-      @required this.onChanged,
-      @required this.position})
+  Tapbox({Key key,
+    this.active: 0,
+    @required this.onChanged,
+    @required this.position})
       : super(key: key);
 
   final int active;
@@ -311,15 +311,12 @@ class TicTacToePVPScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tic Tac Toe PVP',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Tic Tac Toe PVP'),
-        ),
-        body: Center(
-          child: BoardWidget(false),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tic Tac Toe PVP'),
+      ),
+      body: Center(
+        child: BoardWidget(false),
       ),
     );
   }
@@ -330,15 +327,12 @@ class TicTacToePVCScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tic Tac Toe Computer',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Tic Tac Toe Computer'),
-        ),
-        body: Center(
-          child: BoardWidget(true),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tic Tac Toe Computer'),
+      ),
+      body: Center(
+        child: BoardWidget(true),
       ),
     );
   }
@@ -357,26 +351,23 @@ class TicTacToeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tic Tac Toe',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Tic Tac Toe'),
-        ),
-        body: Center(
-          child: ListView(
-            children: [
-              ElevatedButton(
-                child: Center(child: Text('PVP')),
-                onPressed: () => this.onTicTacToePVPPressed(context),
-              ),
-              Divider(),
-              ElevatedButton(
-                child: Center(child: Text('Computer')),
-                onPressed: () => this.onTicTacToePVCPressed(context),
-              ),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tic Tac Toe'),
+      ),
+      body: Center(
+        child: ListView(
+          children: [
+            ElevatedButton(
+              child: Center(child: Text('PVP')),
+              onPressed: () => this.onTicTacToePVPPressed(context),
+            ),
+            Divider(),
+            ElevatedButton(
+              child: Center(child: Text('Computer')),
+              onPressed: () => this.onTicTacToePVCPressed(context),
+            ),
+          ],
         ),
       ),
     );
