@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gca/F1ReactionGameScreen.dart';
 import 'package:gca/MainMenuScreen.dart';
 import 'package:gca/TicTacToeScreen.dart';
+import 'package:page_transition/page_transition.dart';
 
 import 'ConnectFourScreen.dart';
 import 'ReactionGameScreen.dart';
@@ -29,15 +30,45 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       routes: {
-        TicTacToeScreen.routeName: (context) => TicTacToeScreen(),
-        TicTacToePVCScreen.routeName: (context) => TicTacToePVCScreen(),
-        TicTacToePVPScreen.routeName: (context) => TicTacToePVPScreen(),
         MainMenuScreen.routeName: (context) => MainMenuScreen(),
         ConnectFourScreen.routeName: (context) => ConnectFourScreen(),
         ReactionGameScreen.routeName: (context) => ReactionGameScreen(4),
         F1ReactionGameStartScreen.routeName: (context) => F1ReactionGameStartScreen(),
       },
       initialRoute: MainMenuScreen.routeName,
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case TicTacToeScreen.routeName:
+            return PageTransition(
+              child: TicTacToeScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 500),
+              reverseDuration: Duration(milliseconds: 500),
+            );
+            break;
+          case TicTacToePVCScreen.routeName:
+            return PageTransition(
+              child: TicTacToePVCScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 500),
+              reverseDuration: Duration(milliseconds: 500),
+            );
+            break;
+          case TicTacToePVPScreen.routeName:
+            return PageTransition(
+              child: TicTacToePVPScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 500),
+              reverseDuration: Duration(milliseconds: 500),
+            );
+            break;
+          default:
+            return null;
+        }
+      },
     );
   }
 }
