@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gca/ConnectFourScreen.dart';
+import 'package:gca/RockPaperScissors.dart';
 import 'package:gca/TicTacToeScreen.dart';
 
 import 'ReactionGameScreen.dart';
@@ -45,7 +46,7 @@ class MainMenuScreen extends StatelessWidget {
                         flex: 10,
                         child: Center(
                             child: Text('Tic Tac Toe',
-                                style: TextStyle(fontSize: 13)))),
+                                textAlign: TextAlign.center))),
                     Spacer(flex: 8),
                   ]),
               onPressed: () => this.onTicTacToePressed(context),
@@ -72,7 +73,7 @@ class MainMenuScreen extends StatelessWidget {
                         flex: 10,
                         child: Center(
                             child: Text('Connect Four',
-                                style: TextStyle(fontSize: 13)))),
+                                textAlign: TextAlign.center))),
                     Spacer(flex: 8),
                   ]),
               onPressed: () => this.onConnectFourPressed(context),
@@ -89,7 +90,7 @@ class MainMenuScreen extends StatelessWidget {
                   children: [
                     Spacer(flex: 8),
                     Expanded(
-                        flex: 10,
+                        flex: 11,
                         child: Icon(
                           Icons.hourglass_top,
                           color: Colors.white,
@@ -99,10 +100,37 @@ class MainMenuScreen extends StatelessWidget {
                         flex: 10,
                         child: Center(
                             child: Text('Reaction Game',
-                                style: TextStyle(fontSize: 13)))),
+                                textAlign: TextAlign.center))),
                     Spacer(flex: 8),
                   ]),
               onPressed: () => this.onReactionGamePressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
+            ),
+            GridDivider(),
+            ElevatedButton(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.cut,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 11,
+                        child: Center(
+                            child: Text('Rock Paper Scissor',
+                                textAlign: TextAlign.center))),
+                    Spacer(flex: 8),
+                  ]),
+              onPressed: () => this.onRPSPressed(context),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green[900], // background
                 onPrimary: Colors.white, // foreground
@@ -122,5 +150,9 @@ class MainMenuScreen extends StatelessWidget {
 
   void onReactionGamePressed(BuildContext context) {
     Navigator.pushNamed(context, ReactionGameScreen.routeName);
+  }
+
+  void onRPSPressed(BuildContext context) {
+    Navigator.pushNamed(context, RPSScreen.routeName);
   }
 }
