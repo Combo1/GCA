@@ -21,14 +21,15 @@ class _BoardWidgetState extends State<BoardWidget> {
   String _message() {
     switch (_state) {
       case 0:
+        return "Turn of Player O";
       case 1:
-        return "";
+        return "Turn of Player X";
       case 2:
-        return "Player O wins!";
+        return "Player O wins! Restart?";
       case 3:
-        return "Player X wins!";
+        return "Player X wins! Restart?";
       case 4:
-        return "Draw!";
+        return "Draw! Restart?";
     }
   }
 
@@ -133,7 +134,16 @@ class _BoardWidgetState extends State<BoardWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      GameState(state: _state, onChanged: _restart),
+      Card(
+        color: Colors.white,
+        shadowColor: Colors.redAccent,
+        child: Center(
+          child: Text(
+            _message(),
+            style: TextStyle(fontSize: 32.0, color: Colors.black),
+          ),
+        ),
+      ),
       Container(
           child: Column(children: [
             Row(children: [
@@ -260,52 +270,6 @@ class Tapbox extends StatelessWidget {
   }
 }
 
-class GameState extends StatelessWidget {
-  GameState({Key key, this.state: 0, @required this.onChanged})
-      : super(key: key);
-
-  final int state;
-  final ValueChanged<int> onChanged;
-
-  void _handleTap() {
-    onChanged(state);
-  }
-
-  String _message() {
-    switch (state) {
-      case 0:
-        return "Turn of Player O";
-      case 1:
-        return "Turn of Player X";
-      case 2:
-        return "Player O wins! Restart?";
-      case 3:
-        return "Player X wins! Restart?";
-      case 4:
-        return "Draw! Restart?";
-    }
-  }
-
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: _handleTap,
-        child: Container(
-          child: Center(
-            child: Text(
-              _message(),
-              style: TextStyle(fontSize: 32.0, color: Colors.black),
-            ),
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class TicTacToePVPScreen extends StatelessWidget {
   static const routeName = '/games/tictactoe/PVP';
 
@@ -314,6 +278,7 @@ class TicTacToePVPScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Tic Tac Toe PVP'),
+        backgroundColor: Color.fromRGBO(100, 32, 40, 1),
       ),
       body: Center(
         child: BoardWidget(false),
@@ -330,6 +295,7 @@ class TicTacToePVCScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Tic Tac Toe Computer'),
+        backgroundColor: Color.fromRGBO(100, 32, 40, 1),
       ),
       body: Center(
         child: BoardWidget(true),
@@ -354,6 +320,7 @@ class TicTacToeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Tic Tac Toe'),
+        backgroundColor: Color.fromRGBO(100, 32, 40, 1),
       ),
       body: Center(
         child: ListView(
@@ -361,11 +328,19 @@ class TicTacToeScreen extends StatelessWidget {
             ElevatedButton(
               child: Center(child: Text('PVP')),
               onPressed: () => this.onTicTacToePVPPressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
             ),
             Divider(),
             ElevatedButton(
               child: Center(child: Text('Computer')),
               onPressed: () => this.onTicTacToePVCPressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
             ),
           ],
         ),
