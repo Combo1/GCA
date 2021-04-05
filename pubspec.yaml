@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   tuple: ^2.0.0
+  audioplayers: any
   page_transition: "^1.1.7+6"
 
 
@@ -57,6 +58,7 @@ flutter:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
+      - assets/Audio/zapsplat_foley_stones_pebbles_few_place_down_001.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
