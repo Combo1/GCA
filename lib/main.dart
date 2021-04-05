@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:gca/F1ReactionGameScreen.dart';
 import 'package:gca/MainMenuScreen.dart';
+import 'package:gca/StatisticsModel.dart';
 import 'package:gca/TicTacToeScreen.dart';
 
 import 'ConnectFourScreen.dart';
 import 'ReactionGameScreen.dart';
 
+import 'package:provider/provider.dart';
+
+
 void main() {
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => StatisticsModel(),
+      child: MyApp()
+  ));
 }
 
 class MyApp extends StatelessWidget {
