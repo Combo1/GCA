@@ -12,7 +12,6 @@ class GridDivider extends StatelessWidget {
   }
 }
 
-
 class MainMenuScreen extends StatelessWidget {
   static const routeName = '/';
 
@@ -30,7 +29,25 @@ class MainMenuScreen extends StatelessWidget {
           crossAxisSpacing: 4,
           children: [
             ElevatedButton(
-              child: Center(child: Text('Tic Tac Toe')),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.apps,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 10,
+                        child: Center(
+                            child: Text('Tic Tac Toe',
+                                style: TextStyle(fontSize: 13)))),
+                    Spacer(flex: 8),
+                  ]),
               onPressed: () => this.onTicTacToePressed(context),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green[900], // background
@@ -39,7 +56,25 @@ class MainMenuScreen extends StatelessWidget {
             ),
             GridDivider(),
             ElevatedButton(
-              child: Center(child: Text('Connect Four')),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.blur_linear,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 10,
+                        child: Center(
+                            child: Text('Connect Four',
+                                style: TextStyle(fontSize: 13)))),
+                    Spacer(flex: 8),
+                  ]),
               onPressed: () => this.onConnectFourPressed(context),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green[900], // background
@@ -48,8 +83,26 @@ class MainMenuScreen extends StatelessWidget {
             ),
             GridDivider(),
             ElevatedButton(
-              child: Center(child: Text('Reaction Game')),
-              onPressed: () => this.onF1GamePressed(context),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.hourglass_top,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 10,
+                        child: Center(
+                            child: Text('Reaction Game',
+                                style: TextStyle(fontSize: 13)))),
+                    Spacer(flex: 8),
+                  ]),
+              onPressed: () => this.onReactionGamePressed(context),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green[900], // background
                 onPrimary: Colors.white, // foreground
@@ -67,7 +120,7 @@ class MainMenuScreen extends StatelessWidget {
     Navigator.pushNamed(context, ConnectFourScreen.routeName);
   }
 
-  void onF1GamePressed(BuildContext context) {
+  void onReactionGamePressed(BuildContext context) {
     Navigator.pushNamed(context, ReactionGameScreen.routeName);
   }
 }
