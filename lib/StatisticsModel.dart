@@ -33,7 +33,7 @@ class StatisticsModel extends ChangeNotifier {
     if (jsonData != '' && jsonData != null) {
       var dataObjsJson = jsonDecode(jsonData);
       var array = dataObjsJson["data"];
-      var arr1 = jsonDecode(array);
+    var arr1 = jsonDecode(array);
       arr1.forEach((entryJson) {
         GameStatisticEntry newEntry = GameStatisticEntry.fromJson(entryJson);
         //print('To look at: ${newEntry.keyGame}, ${newEntry.keyValue}, ${newEntry.value}');
@@ -41,6 +41,9 @@ class StatisticsModel extends ChangeNotifier {
             newEntry.keyGame != null && newEntry.keyValue != null &&
             !this.containsKey(newEntry.keyGame, newEntry.keyValue)) {
           _gameValues.add(newEntry);
+        }else if(this.containsKey(newEntry.keyGame, newEntry.keyValue)){
+          //default value exists, overwrite value
+          setValue(newEntry.keyGame, newEntry.keyValue, newEntry.value, saveToDisk: false);
         }
       });
 
@@ -89,6 +92,7 @@ class StatisticsModel extends ChangeNotifier {
   }
 
   String getValue(String keyGame, String keyValue){
+    print('Data Access');
     if(!this.containsKey(keyGame, keyValue)) {
       return "null";
     }else{
@@ -100,7 +104,7 @@ class StatisticsModel extends ChangeNotifier {
     return _gameValues.any((element) => element.contains(keyGame, keyValue));
   }
 
-  void setValue(String keyGame, String keyValue, String value){
+  void setValue(String keyGame, String keyValue, String value, {bool saveToDisk =true}){
     if(this.containsKey(keyGame, keyValue)){
       _gameValues.firstWhere((element) => element.contains(keyGame, keyValue)).value = value;
     }else{
@@ -108,7 +112,9 @@ class StatisticsModel extends ChangeNotifier {
       GameStatisticEntry newGameData = GameStatisticEntry.base(keyGame, keyValue, value);
       _gameValues.add(newGameData);
     }
-    saveValues();
+    if(saveToDisk){
+      saveValues();
+    }
     notifyListeners();
   }
 
