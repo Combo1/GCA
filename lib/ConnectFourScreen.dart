@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'dart:io';
+import 'dart:math';
 
-
+bool isPVP;
 
 class ConnectFourScreen extends StatelessWidget{
   static const routeName = '/games/connectfour';
@@ -38,8 +40,9 @@ class ConnectFourScreen extends StatelessWidget{
   }
 }
 
-class ConnectFourPVCScreen extends StatelessWidget{
+class ConnectFourPVCScreen extends StatefulWidget{
   static const routeName = '/games/connectfour/PVC';
+
 
 
   @override
@@ -48,11 +51,26 @@ class ConnectFourPVCScreen extends StatelessWidget{
       title: 'Connect Four Computer',
     );
   }
+
+  @override
+  _ConnectFourScreenState2 createState() => _ConnectFourScreenState2();
+}
+
+class _ConnectFourScreenState2 extends State<ConnectFourPVCScreen> {
+  @override
+  Widget build(BuildContext context) {
+    setState(() {
+      isPVP = false;
+    });
+    return Home();
+  }
 }
 
 
 class ConnectFourPVPScreen extends StatefulWidget{
   static const routeName = '/games/connectfour/PVP';
+
+
 
   @override
   _ConnectFourScreenState createState() => _ConnectFourScreenState();
@@ -61,6 +79,9 @@ class ConnectFourPVPScreen extends StatefulWidget{
 class _ConnectFourScreenState extends State<ConnectFourPVPScreen> {
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      isPVP = true;
+    });
     return Home();
   }
 }
@@ -77,13 +98,18 @@ class _HomeState extends State<Home> {
   var myturn = true;
 
 
+
   @override
   Widget build(BuildContext context) {
     AssetImage cross = AssetImage("images/cross.png");
     AssetImage circle = AssetImage("images/circle.png");
     AssetImage edit = AssetImage("images/edit.png");
 
+
+
+
     AudioCache _audioCache = AudioCache(prefix: 'assets/Audio/');
+
 
 
     bool checkWin(row, column, myturn) {
@@ -200,8 +226,6 @@ class _HomeState extends State<Home> {
       if(this.list1[row][column] == -1) {
         setState(() {
           if(myturn) {
-            //print(row);
-            //print(column);
             list1[row][findFirstEmptyRow(row)] = 0;
           } else {
             list1[row][findFirstEmptyRow(row)] = 1;
@@ -232,12 +256,13 @@ class _HomeState extends State<Home> {
       );
     }
 
-    /*
+
     bool checkDraw() {
-      for(int i = 0; i < list1.length; i++) {
-        for(int j = 0; j < list1[i].length; i++) {
+      for(int i = 0; i < 7; i++) {
+        for(int j = 0; j < 6; j++) {
           //If any field is not filled then the game is not over
-          if(list1[j][i] != -1) {
+          print(i.toString() + "," + j.toString());
+          if(list1[i][j] == -1) {
             return false;
           }
         }
@@ -266,7 +291,7 @@ class _HomeState extends State<Home> {
           }
       );
     }
-    */
+
 
 
 
@@ -280,18 +305,95 @@ class _HomeState extends State<Home> {
                 playGame(row, column);
                 if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
                   _showDialog(myturn);
-                  }
+                }
+                if(checkDraw()) {
+                  _showDraw();
+                }
                 myturn = !myturn;
+
+                if(isPVP == false) {
+                  sleep(Duration(seconds:1));
+                  _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+                  var rng = new Random();
+                  int row = rng.nextInt(7);
+                  playGame(row, findFirstEmptyRow(row));
+                  if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
+                    _showDialog(myturn);
+                  }
+                  if(checkDraw()) {
+                    _showDraw();
+                  }
+                  myturn = !myturn;
+                }
               }
           );
         }
         break;
         case 0: {
-          return IconButton(iconSize: 32,color: Colors.blue, icon: Icon(Icons.circle), onPressed: () {});
+          return IconButton(iconSize: 32,color: Colors.blue, icon: Icon(Icons.circle), onPressed: () {
+            if(column != 0) {
+              column = findFirstEmptyRow(row);
+
+              _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+              playGame(row, column);
+              if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
+                _showDialog(myturn);
+              }
+              if(checkDraw()) {
+                _showDraw();
+              }
+              myturn = !myturn;
+
+              if(isPVP == false) {
+                sleep(Duration(seconds:1));
+                _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+                var rng = new Random();
+                int row = rng.nextInt(7);
+                playGame(row, findFirstEmptyRow(row));
+                if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
+                  _showDialog(myturn);
+                }
+                if(checkDraw()) {
+                  _showDraw();
+                }
+                myturn = !myturn;
+              }
+            }
+          });
         }
         break;
         case 1: {
-          return IconButton(iconSize: 32, color: Colors.red, icon: Icon(Icons.circle), onPressed: () {});
+          return IconButton(iconSize: 32, color: Colors.red, icon: Icon(Icons.circle), onPressed: () {
+            if(column != 0) {
+
+              column = findFirstEmptyRow(row);
+
+              _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+              playGame(row, column);
+              if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
+                _showDialog(myturn);
+              }
+              if(checkDraw()) {
+                _showDraw();
+              }
+              myturn = !myturn;
+
+              if(isPVP == false) {
+                sleep(Duration(seconds:1));
+                _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+                var rng = new Random();
+                int row = rng.nextInt(7);
+                playGame(row, findFirstEmptyRow(row));
+                if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
+                  _showDialog(myturn);
+                }
+                if(checkDraw()) {
+                  _showDraw();
+                }
+                myturn = !myturn;
+              }
+            }
+          });
         }
       }
     }
