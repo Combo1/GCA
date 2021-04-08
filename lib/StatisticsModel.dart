@@ -1,9 +1,8 @@
 
-import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:gca/StatisticConfig.dart';
 //import 'package:json_annotation/json_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -11,17 +10,24 @@ import 'dart:async';
 
 class StatisticsModel extends ChangeNotifier {
   List<GameStatisticEntry> _gameValues = <GameStatisticEntry>[];
-  Future<SharedPreferences> _prefs;
+  SharedPreferences _prefs;
+  bool isLoadCompleted;
 
-
-  StatisticsModel() {
-    loadValues();
+  StatisticsModel(){
+    _gameValues = StatisticConfig().listDefault;
+    isLoadCompleted = false;
+    loadValues().then((value) {
+      isLoadCompleted = true;
+      print('Load completed');
+    });
   }
 
-  void loadValues() {
-    _prefs = SharedPreferences.getInstance();
-    _prefs.then((value) {
-    String jsonData =  value.getString("statistics"); //json data
+
+  Future<void> loadValues() async {
+    print('Init loadValues: $isLoadCompleted');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _prefs = prefs;
+    String jsonData =  prefs.getString("statistics"); //json data
     //parse to game statistics
     print('DataFromSharedStorage: $jsonData');
     if (jsonData != '' && jsonData != null) {
@@ -29,41 +35,57 @@ class StatisticsModel extends ChangeNotifier {
       var array = dataObjsJson["data"];
       var arr1 = jsonDecode(array);
       arr1.forEach((entryJson) {
-        print(entryJson['keyGame']);
         GameStatisticEntry newEntry = GameStatisticEntry.fromJson(entryJson);
         //print('To look at: ${newEntry.keyGame}, ${newEntry.keyValue}, ${newEntry.value}');
-        if(newEntry.keyGame != "null" && newEntry.keyValue != "null" && newEntry.keyGame != null && newEntry.keyValue != null && !this.containsKey(newEntry.keyGame, newEntry.keyValue)){
+        if (newEntry.keyGame != "null" && newEntry.keyValue != "null" &&
+            newEntry.keyGame != null && newEntry.keyValue != null &&
+            !this.containsKey(newEntry.keyGame, newEntry.keyValue)) {
           _gameValues.add(newEntry);
         }
-      }
-      );
+      });
 
       //_gameValues.addAll(values);
     } else {
       _gameValues = <GameStatisticEntry>[];
     }
-  });
   }
 
-  void initDone() async{
-    await _prefs;
-  }
+
 
   void saveValues() {
-    _prefs.then((value) {
+    if(_prefs != null){
       String encoded = jsonEncode(_gameValues);
       Map<String, dynamic> json = Map();
       json['data'] = encoded;
       String jsonEncoded  = jsonEncode(json);
-      value.setString("statistics", jsonEncoded);
+      _prefs.setString("statistics", jsonEncoded);
+      print('Values saved: $jsonEncoded');
+    }
+  }
+
+  void resetAllStats(){
+    loadValues().then((value) {
+      print('reset all stats');
+      _gameValues = StatisticConfig().listDefault;
+      saveValues();
     });
   }
 
-  void resetScore(){
-    print('reset score');
-    _prefs.then((value) {
-      value.setString("statistics", "");
+  void resetStatsGame(String keyGame){
+    loadValues().then((value) {
+      print('reset stats for game with key $keyGame');
+      //delete old keys from list
+      _gameValues.removeWhere((element) => element.keyGame == keyGame);
+      //insert default values to list
+      StatisticConfig().listDefault.forEach((element) {
+        if(element.keyGame == keyGame){
+          _gameValues.add(element);
+        }
+      });
+      //save changes
+      saveValues();
     });
+
   }
 
   String getValue(String keyGame, String keyValue){

@@ -2,6 +2,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:gca/StatisticConfig.dart';
 import 'package:gca/StatisticsModel.dart';
 import 'package:provider/provider.dart';
 
@@ -18,8 +19,7 @@ class ReactionGameScreen extends StatefulWidget {
 }
 
 class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTickerProviderStateMixin{
-  static const REACTION_GAME_KEY = 'REACTION_GAME';
-  static const HIGHSCORE_KEY = 'HIGHSCORE_KEY';
+
   //animation time left
   AnimationController _controller;
 
@@ -54,15 +54,12 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
     _controller.addStatusListener((status) {
       //print('Status: ${status}');
       if(status == AnimationStatus.completed){
-
           this.onTimerComplete();
-
-
       }
     });
     _controller.reset();
     _controller.forward();
-    Provider.of<StatisticsModel>(context, listen: false).initDone();
+    Provider.of<StatisticsModel>(context, listen: false).loadValues();  //ensures loading of stats in shared preferences
   }
 
   @override
@@ -93,7 +90,6 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
       _controller.forward();
     }
     configureNextScenario();
-
   }
 
   void onTimerComplete(){
@@ -101,13 +97,13 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
       _isGameRunning = false;
       //set score
       //get current highscore
-      String currentHighscore = Provider.of<StatisticsModel>(context, listen: false).getValue(REACTION_GAME_KEY, HIGHSCORE_KEY);
+      String currentHighscore = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST);
       print('Read Value: $currentHighscore');
       int score = (currentHighscore == "null" || currentHighscore == null)? 0: int.parse(currentHighscore);
       print('Read score: $score, new score: $_counterSolved');
       if(_counterSolved > score){
         //save new highscore
-        Provider.of<StatisticsModel>(context, listen: false).setValue(REACTION_GAME_KEY, HIGHSCORE_KEY, "$_counterSolved");
+        Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST, "$_counterSolved");
       }
     });
   }
@@ -285,7 +281,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Center(child: Text('Your Score: ${this._counterSolved}', style: TextStyle(fontSize: 40)),),
-                Center(child: Text('Best Score: ${(model.getValue(REACTION_GAME_KEY, HIGHSCORE_KEY) != "null")?model.getValue(REACTION_GAME_KEY, HIGHSCORE_KEY) : '0'}', style: TextStyle(fontSize: 40)),),
+                Center(child: Text('Best Score: ${model.getValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST)}', style: TextStyle(fontSize: 40)),),
                 SizedBox(height: 100,),
                 ElevatedButton(onPressed: this.retryGame, child: Padding(padding: EdgeInsets.all(10,), child: Text('Retry', style: TextStyle(fontSize: 30))),),
                 SizedBox(height: 20,),
