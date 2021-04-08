@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
               reverseDuration: Duration(milliseconds: 400),
             );
             break;
-          case ConnectFourPVCScreen.routeName:
+          case ConnectFourPVPScreen.routeName:
             return PageTransition(
               child: ConnectFourPVPScreen(),
               type: PageTransitionType.fade,
