@@ -3,6 +3,7 @@ import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:io';
 import 'dart:math';
+import 'dart:async';
 
 bool isPVP;
 
@@ -105,11 +106,7 @@ class _HomeState extends State<Home> {
     AssetImage circle = AssetImage("images/circle.png");
     AssetImage edit = AssetImage("images/edit.png");
 
-
-
-
     AudioCache _audioCache = AudioCache(prefix: 'assets/Audio/');
-
 
 
     bool checkWin(row, column, myturn) {
@@ -261,7 +258,6 @@ class _HomeState extends State<Home> {
       for(int i = 0; i < 7; i++) {
         for(int j = 0; j < 6; j++) {
           //If any field is not filled then the game is not over
-          print(i.toString() + "," + j.toString());
           if(list1[i][j] == -1) {
             return false;
           }
@@ -311,19 +307,22 @@ class _HomeState extends State<Home> {
                 }
                 myturn = !myturn;
 
-                if(isPVP == false) {
-                  sleep(Duration(seconds:1));
-                  _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
-                  var rng = new Random();
-                  int row = rng.nextInt(7);
-                  playGame(row, findFirstEmptyRow(row));
-                  if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
-                    _showDialog(myturn);
-                  }
-                  if(checkDraw()) {
-                    _showDraw();
-                  }
-                  myturn = !myturn;
+                if(isPVP == false && checkWin(row, findFirstEmptyRow(row)+1, myturn) == false) {
+                  Timer(Duration(seconds:1), ()
+                  {
+                    _audioCache.play(
+                        'zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+                    var rng = new Random();
+                    int row = rng.nextInt(7);
+                    playGame(row, findFirstEmptyRow(row));
+                    if (checkWin(row, findFirstEmptyRow(row) + 1, myturn)) {
+                      _showDialog(myturn);
+                    }
+                    if (checkDraw()) {
+                      _showDraw();
+                    }
+                    myturn = !myturn;
+                  });
                 }
               }
           );
@@ -344,19 +343,22 @@ class _HomeState extends State<Home> {
               }
               myturn = !myturn;
 
-              if(isPVP == false) {
-                sleep(Duration(seconds:1));
-                _audioCache.play('zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
-                var rng = new Random();
-                int row = rng.nextInt(7);
-                playGame(row, findFirstEmptyRow(row));
-                if(checkWin(row, findFirstEmptyRow(row)+1, myturn)) {
-                  _showDialog(myturn);
-                }
-                if(checkDraw()) {
-                  _showDraw();
-                }
-                myturn = !myturn;
+              if(isPVP == false && checkWin(row, findFirstEmptyRow(row)+1, myturn) == false) {
+                Timer(Duration(seconds:1), ()
+                {
+                  _audioCache.play(
+                      'zapsplat_foley_stones_pebbles_few_place_down_001.mp3');
+                  var rng = new Random();
+                  int row = rng.nextInt(7);
+                  playGame(row, findFirstEmptyRow(row));
+                  if (checkWin(row, findFirstEmptyRow(row) + 1, myturn)) {
+                    _showDialog(myturn);
+                  }
+                  if (checkDraw()) {
+                    _showDraw();
+                  }
+                  myturn = !myturn;
+                });
               }
             }
           });
@@ -406,91 +408,105 @@ class _HomeState extends State<Home> {
 
         backgroundColor: Colors.white,
         body: Container(
-            child:Column(
 
+            child: new Stack(
                 children: <Widget> [
-                  Card(margin: EdgeInsets.fromLTRB(16, 16, 16, 16), child: Column(children: <Widget> [
-                    Text("It is player's " + (myturn?"blue":"red") + " turn.", style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                    )),
-                  ])),
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                          children: <Widget> [get_Icon(list1[0][0], 0, 0),
-                            get_Icon(list1[0][1], 0, 1),
-                            get_Icon(list1[0][2], 0, 2),
-                            get_Icon(list1[0][3], 0, 3),
-                            get_Icon(list1[0][4], 0, 4),
-                            get_Icon(list1[0][5], 0, 5),
-                          ]
-                        //list1[0].map((state) => get_Icon(state)).toList(),
-                      ), Column(
-                          children: <Widget> [get_Icon(list1[1][0], 1, 0),
-                            get_Icon(list1[1][1], 1, 1),
-                            get_Icon(list1[1][2], 1, 2),
-                            get_Icon(list1[1][3], 1, 3),
-                            get_Icon(list1[1][4], 1, 4),
-                            get_Icon(list1[1][5], 1, 5),
-                          ]
-
-                        //list1[1].map((state) => get_Icon(state)).toList(),
-                      ), Column(
-                          children:
-                          <Widget> [get_Icon(list1[2][0], 2, 0),
-                            get_Icon(list1[2][1], 2, 1),
-                            get_Icon(list1[2][2], 2, 2),
-                            get_Icon(list1[2][3], 2, 3),
-                            get_Icon(list1[2][4], 2, 4),
-                            get_Icon(list1[2][5], 2, 5),
-                          ]
-                        //list1[2].map((state) => get_Icon(state)).toList(),
-                      ), Column(
-                          children:
-                          <Widget> [get_Icon(list1[3][0], 3, 0),
-                            get_Icon(list1[3][1], 3, 1),
-                            get_Icon(list1[3][2], 3, 2),
-                            get_Icon(list1[3][3], 3, 3),
-                            get_Icon(list1[3][4], 3, 4),
-                            get_Icon(list1[3][5], 3, 5),
-                          ]
-                        //list1[3].map((state) => get_Icon(state)).toList(),
-                      ), Column(
-                          children:
-                          <Widget> [get_Icon(list1[4][0], 4, 0),
-                            get_Icon(list1[4][1], 4, 1),
-                            get_Icon(list1[4][2], 4, 2),
-                            get_Icon(list1[4][3], 4, 3),
-                            get_Icon(list1[4][4], 4, 4),
-                            get_Icon(list1[4][5], 4, 5),
-                          ]
-                        //list1[4].map((state) => get_Icon(state)).toList(),
-                      ), Column(
-                          children:
-                          <Widget> [get_Icon(list1[5][0], 5, 0),
-                            get_Icon(list1[5][1], 5, 1),
-                            get_Icon(list1[5][2], 5, 2),
-                            get_Icon(list1[5][3], 5, 3),
-                            get_Icon(list1[5][4], 5, 4),
-                            get_Icon(list1[5][5], 5, 5),
-                          ]
-                        //list1[5].map((state) => get_Icon(state)).toList(),
-                      ), Column(
-                          children:
-                          <Widget> [get_Icon(list1[6][0], 6, 0),
-                            get_Icon(list1[6][1], 6, 1),
-                            get_Icon(list1[6][2], 6, 2),
-                            get_Icon(list1[6][3], 6, 3),
-                            get_Icon(list1[6][4], 6, 4),
-                            get_Icon(list1[6][5], 6, 5),
-                          ]
-                        //list1[6].map((state) => get_Icon(state)).toList(),
-                      ),],
+                  Center(child: Image(
+                    image: AssetImage(
+                          'assets/Background/Board.png'
+                        ),
+                    width: 337,
+                    height: 470,
+                    alignment: Alignment(0, -1.685),
                   )
+                  ),
+                  Column(
+                      children: <Widget> [
+                        Card(margin: EdgeInsets.fromLTRB(16, 16, 16, 16), child: Column(children: <Widget> [
+                          Text("It is player's " + (myturn?"blue":"red") + " turn.", style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                          )),
+                        ])),
+                        SizedBox(height: 20,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                                children: <Widget> [get_Icon(list1[0][0], 0, 0),
+                                  get_Icon(list1[0][1], 0, 1),
+                                  get_Icon(list1[0][2], 0, 2),
+                                  get_Icon(list1[0][3], 0, 3),
+                                  get_Icon(list1[0][4], 0, 4),
+                                  get_Icon(list1[0][5], 0, 5),
+                                ]
+                              //list1[0].map((state) => get_Icon(state)).toList(),
+                            ), Column(
+                                children: <Widget> [get_Icon(list1[1][0], 1, 0),
+                                  get_Icon(list1[1][1], 1, 1),
+                                  get_Icon(list1[1][2], 1, 2),
+                                  get_Icon(list1[1][3], 1, 3),
+                                  get_Icon(list1[1][4], 1, 4),
+                                  get_Icon(list1[1][5], 1, 5),
+                                ]
+
+                              //list1[1].map((state) => get_Icon(state)).toList(),
+                            ), Column(
+                                children:
+                                <Widget> [get_Icon(list1[2][0], 2, 0),
+                                  get_Icon(list1[2][1], 2, 1),
+                                  get_Icon(list1[2][2], 2, 2),
+                                  get_Icon(list1[2][3], 2, 3),
+                                  get_Icon(list1[2][4], 2, 4),
+                                  get_Icon(list1[2][5], 2, 5),
+                                ]
+                              //list1[2].map((state) => get_Icon(state)).toList(),
+                            ), Column(
+                                children:
+                                <Widget> [get_Icon(list1[3][0], 3, 0),
+                                  get_Icon(list1[3][1], 3, 1),
+                                  get_Icon(list1[3][2], 3, 2),
+                                  get_Icon(list1[3][3], 3, 3),
+                                  get_Icon(list1[3][4], 3, 4),
+                                  get_Icon(list1[3][5], 3, 5),
+                                ]
+                              //list1[3].map((state) => get_Icon(state)).toList(),
+                            ), Column(
+                                children:
+                                <Widget> [get_Icon(list1[4][0], 4, 0),
+                                  get_Icon(list1[4][1], 4, 1),
+                                  get_Icon(list1[4][2], 4, 2),
+                                  get_Icon(list1[4][3], 4, 3),
+                                  get_Icon(list1[4][4], 4, 4),
+                                  get_Icon(list1[4][5], 4, 5),
+                                ]
+                              //list1[4].map((state) => get_Icon(state)).toList(),
+                            ), Column(
+                                children:
+                                <Widget> [get_Icon(list1[5][0], 5, 0),
+                                  get_Icon(list1[5][1], 5, 1),
+                                  get_Icon(list1[5][2], 5, 2),
+                                  get_Icon(list1[5][3], 5, 3),
+                                  get_Icon(list1[5][4], 5, 4),
+                                  get_Icon(list1[5][5], 5, 5),
+                                ]
+                              //list1[5].map((state) => get_Icon(state)).toList(),
+                            ), Column(
+                                children:
+                                <Widget> [get_Icon(list1[6][0], 6, 0),
+                                  get_Icon(list1[6][1], 6, 1),
+                                  get_Icon(list1[6][2], 6, 2),
+                                  get_Icon(list1[6][3], 6, 3),
+                                  get_Icon(list1[6][4], 6, 4),
+                                  get_Icon(list1[6][5], 6, 5),
+                                ]
+                              //list1[6].map((state) => get_Icon(state)).toList(),
+                            ),],
+                        )
+                      ]
+                  )
+
                 ]
             )
         )
