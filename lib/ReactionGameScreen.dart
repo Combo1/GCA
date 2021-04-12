@@ -2,6 +2,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:gca/StatisticConfig.dart';
+import 'package:gca/StatisticsModel.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -16,6 +19,7 @@ class ReactionGameScreen extends StatefulWidget {
 }
 
 class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTickerProviderStateMixin{
+
   //animation time left
   AnimationController _controller;
 
@@ -35,7 +39,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
   int _counterSolved;
   int _pointsForSolving;
   //game info
-  static const int gameDuration = 30;
+  static const int gameDuration = 10;
   bool _isGameRunning = false;
 
 
@@ -50,15 +54,12 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
     _controller.addStatusListener((status) {
       //print('Status: ${status}');
       if(status == AnimationStatus.completed){
-
           this.onTimerComplete();
-
-
       }
     });
     _controller.reset();
     _controller.forward();
-
+    Provider.of<StatisticsModel>(context, listen: false).loadValues();  //ensures loading of stats in shared preferences
   }
 
   @override
@@ -89,12 +90,21 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
       _controller.forward();
     }
     configureNextScenario();
-
   }
 
   void onTimerComplete(){
     setState(() {
       _isGameRunning = false;
+      //set score
+      //get current highscore
+      String currentHighscore = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST);
+      print('Read Value: $currentHighscore');
+      int score = (currentHighscore == "null" || currentHighscore == null)? 0: int.parse(currentHighscore);
+      print('Read score: $score, new score: $_counterSolved');
+      if(_counterSolved > score){
+        //save new highscore
+        Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST, "$_counterSolved");
+      }
     });
   }
 
@@ -264,16 +274,23 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
     }else{
       //show buttons retry and back to menu
       //Expanded(child: SizedBox.expand());
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-        Center(child: Text('Your Score: ${this._counterSolved}', style: TextStyle(fontSize: 40)),),
-          SizedBox(height: 100,),
-        ElevatedButton(onPressed: this.retryGame, child: Padding(padding: EdgeInsets.all(10,), child: Text('Retry', style: TextStyle(fontSize: 30))),),
-        SizedBox(height: 20,),
-        ElevatedButton(onPressed: this.backToMainMenu, child: Padding(padding: EdgeInsets.all(10,), child: Text('Back', style: TextStyle(fontSize: 30))),),
-      ],
-      );
+      return
+        Consumer<StatisticsModel>(
+          builder: (context, model, child) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(child: Text('Your Score: ${this._counterSolved}', style: TextStyle(fontSize: 40)),),
+                Center(child: Text('Best Score: ${model.getValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST)}', style: TextStyle(fontSize: 40)),),
+                SizedBox(height: 100,),
+                ElevatedButton(onPressed: this.retryGame, child: Padding(padding: EdgeInsets.all(10,), child: Text('Retry', style: TextStyle(fontSize: 30))),),
+                SizedBox(height: 20,),
+                ElevatedButton(onPressed: this.backToMainMenu, child: Padding(padding: EdgeInsets.all(10,), child: Text('Back', style: TextStyle(fontSize: 30))),),
+              ],
+            );
+          }
+        )
+        ;
     }
   }
 }

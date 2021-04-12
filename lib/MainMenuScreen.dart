@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gca/ConnectFourScreen.dart';
+import 'package:gca/StatisticConfig.dart';
+import 'package:gca/StatisticsModel.dart';
 import 'package:gca/RockPaperScissors.dart';
 import 'package:gca/TicTacToeScreen.dart';
+import 'package:provider/provider.dart';
 
 import 'ReactionGameScreen.dart';
 
@@ -136,8 +139,18 @@ class MainMenuScreen extends StatelessWidget {
                 onPrimary: Colors.white, // foreground
               ),
             ),
+            ElevatedButton(onPressed: () => this.resetAllStats(context), child: Center(child: Text('Reset All', )),),
+            ElevatedButton(onPressed: () => this.resetReactionGameStats(context), child: Center(child: Text('Reset Reaction Game Stats'))),
           ],
         ));
+  }
+
+  void resetAllStats(BuildContext context){
+    Provider.of<StatisticsModel>(context, listen: false).resetAllStats();
+  }
+
+  void resetReactionGameStats(BuildContext context){
+    Provider.of<StatisticsModel>(context, listen: false).resetStatsGame(StatConst.KEY_REACTION_GAME);
   }
 
   void onTicTacToePressed(BuildContext context) {
