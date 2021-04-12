@@ -105,6 +105,9 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
         //save new highscore
         Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST, "$_counterSolved");
       }
+      String amountGames = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_AMOUNT_GAMES);
+      int curGames = ((amountGames != "null")? int.parse(amountGames) : 0) + 1;
+      Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_AMOUNT_GAMES, "$curGames");
     });
   }
 
@@ -282,6 +285,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
               children: [
                 Center(child: Text('Your Score: ${this._counterSolved}', style: TextStyle(fontSize: 40)),),
                 Center(child: Text('Best Score: ${model.getValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_PERSONAL_BEST)}', style: TextStyle(fontSize: 40)),),
+                Center(child: Text('Amount Games: ${model.getValue(StatConst.KEY_REACTION_GAME, StatConst.KEY_AMOUNT_GAMES)}', style: TextStyle(fontSize: 40)),),
                 SizedBox(height: 100,),
                 ElevatedButton(onPressed: this.retryGame, child: Padding(padding: EdgeInsets.all(10,), child: Text('Retry', style: TextStyle(fontSize: 30))),),
                 SizedBox(height: 20,),

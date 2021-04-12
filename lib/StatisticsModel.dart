@@ -18,13 +18,13 @@ class StatisticsModel extends ChangeNotifier {
     isLoadCompleted = false;
     loadValues().then((value) {
       isLoadCompleted = true;
-      print('Load completed');
+      //print('Load completed');
     });
   }
 
 
   Future<void> loadValues() async {
-    print('Init loadValues: $isLoadCompleted');
+    //print('Init loadValues: $isLoadCompleted');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _prefs = prefs;
     String jsonData =  prefs.getString("statistics"); //json data
@@ -92,7 +92,7 @@ class StatisticsModel extends ChangeNotifier {
   }
 
   String getValue(String keyGame, String keyValue){
-    print('Data Access');
+    //print('Data Access');
     if(!this.containsKey(keyGame, keyValue)) {
       return "null";
     }else{

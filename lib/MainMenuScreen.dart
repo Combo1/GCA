@@ -139,8 +139,8 @@ class MainMenuScreen extends StatelessWidget {
                 onPrimary: Colors.white, // foreground
               ),
             ),
-            ElevatedButton(onPressed: () => this.resetAllStats(context), child: Center(child: Text('Reset All', )),),
-            ElevatedButton(onPressed: () => this.resetReactionGameStats(context), child: Center(child: Text('Reset Reaction Game Stats'))),
+            //ElevatedButton(onPressed: () => this.resetAllStats(context), child: Center(child: Text('Reset All', )),),
+            //ElevatedButton(onPressed: () => this.resetReactionGameStats(context), child: Center(child: Text('Reset Reaction Game Stats'))),
           ],
         ));
   }
