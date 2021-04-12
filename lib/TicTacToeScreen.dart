@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
 import 'dart:math';
-import 'dart:io';
 
 //------------------------ ParentWidget --------------------------------
 class BoardWidget extends StatefulWidget {
@@ -17,6 +16,51 @@ class _BoardWidgetState extends State<BoardWidget> {
   _BoardWidgetState(this.bot);
 
   final bool bot;
+
+  String _message() {
+    switch (_state) {
+      case 0:
+        return "Turn of Player O";
+      case 1:
+        return "Turn of Player X";
+      case 2:
+        return "Player O wins! Restart?";
+      case 3:
+        return "Player X wins! Restart?";
+      case 4:
+        return "Draw! Restart?";
+    }
+  }
+
+  void _showEndDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Game Over"),
+          content: new Text(_message()),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("Restart"),
+              onPressed: () {
+                _restart(_state);
+                Navigator.of(context).pop();
+              },
+            ),
+            new TextButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   //bool _active = false;
   var _board = List.generate(
@@ -65,9 +109,11 @@ class _BoardWidgetState extends State<BoardWidget> {
   void _handleTapboxChanged(Tuple2<int, int> position) {
     if (_handleSelection(position) == 1 && bot) {
       Future.delayed(const Duration(milliseconds: 200), () {
-        while (_handleSelection(Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
+        while (_handleSelection(
+            Tuple2<int, int>(_random.nextInt(3), _random.nextInt(3))) == 1) {}
       });
     }
+    if (_state > 1) _showEndDialog();
   }
 
   void _restart(int state) {
@@ -87,7 +133,16 @@ class _BoardWidgetState extends State<BoardWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      GameState(state: _state, onChanged: _restart),
+      Card(
+        color: Colors.white,
+        shadowColor: Colors.redAccent,
+        child: Center(
+          child: Text(
+            _message(),
+            style: TextStyle(fontSize: 32.0, color: Colors.black),
+          ),
+        ),
+      ),
       Container(
           child: Column(children: [
             Row(children: [
@@ -144,9 +199,9 @@ class _BoardWidgetState extends State<BoardWidget> {
           ]),
           decoration: BoxDecoration(
               border: Border(
-            bottom: BorderSide(color: Colors.black),
-            right: BorderSide(color: Colors.black),
-          )))
+                bottom: BorderSide(color: Colors.black),
+                right: BorderSide(color: Colors.black),
+              )))
     ]);
   }
 }
@@ -154,11 +209,10 @@ class _BoardWidgetState extends State<BoardWidget> {
 //------------------------- TapboxB ----------------------------------
 
 class Tapbox extends StatelessWidget {
-  Tapbox(
-      {Key key,
-      this.active: 0,
-      @required this.onChanged,
-      @required this.position})
+  Tapbox({Key key,
+    this.active: 0,
+    @required this.onChanged,
+    @required this.position})
       : super(key: key);
 
   final int active;
@@ -215,66 +269,18 @@ class Tapbox extends StatelessWidget {
   }
 }
 
-class GameState extends StatelessWidget {
-  GameState({Key key, this.state: 0, @required this.onChanged})
-      : super(key: key);
-
-  final int state;
-  final ValueChanged<int> onChanged;
-
-  void _handleTap() {
-    onChanged(state);
-  }
-
-  String _message() {
-    switch (state) {
-      case 0:
-        return "Turn of Player O";
-      case 1:
-        return "Turn of Player X";
-      case 2:
-        return "Player O wins! Restart?";
-      case 3:
-        return "Player X wins! Restart?";
-      case 4:
-        return "Draw! Restart?";
-    }
-  }
-
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: _handleTap,
-        child: Container(
-          child: Center(
-            child: Text(
-              _message(),
-              style: TextStyle(fontSize: 32.0, color: Colors.black),
-            ),
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class TicTacToePVPScreen extends StatelessWidget {
   static const routeName = '/games/tictactoe/PVP';
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tic Tac Toe PVP',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Tic Tac Toe PVP'),
-        ),
-        body: Center(
-          child: BoardWidget(false),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tic Tac Toe PVP'),
+        backgroundColor: Color.fromRGBO(100, 32, 40, 1),
+      ),
+      body: Center(
+        child: BoardWidget(false),
       ),
     );
   }
@@ -285,15 +291,13 @@ class TicTacToePVCScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tic Tac Toe Computer',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Tic Tac Toe Computer'),
-        ),
-        body: Center(
-          child: BoardWidget(true),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tic Tac Toe Computer'),
+        backgroundColor: Color.fromRGBO(100, 32, 40, 1),
+      ),
+      body: Center(
+        child: BoardWidget(true),
       ),
     );
   }
@@ -312,26 +316,32 @@ class TicTacToeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tic Tac Toe',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Tic Tac Toe'),
-        ),
-        body: Center(
-          child: ListView(
-            children: [
-              ElevatedButton(
-                child: Center(child: Text('PVP')),
-                onPressed: () => this.onTicTacToePVPPressed(context),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tic Tac Toe'),
+        backgroundColor: Color.fromRGBO(100, 32, 40, 1),
+      ),
+      body: Center(
+        child: ListView(
+          children: [
+            ElevatedButton(
+              child: Center(child: Text('PVP')),
+              onPressed: () => this.onTicTacToePVPPressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
               ),
-              Divider(),
-              ElevatedButton(
-                child: Center(child: Text('Computer')),
-                onPressed: () => this.onTicTacToePVCPressed(context),
+            ),
+            Divider(),
+            ElevatedButton(
+              child: Center(child: Text('Computer')),
+              onPressed: () => this.onTicTacToePVCPressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -3,10 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:gca/ConnectFourScreen.dart';
 import 'package:gca/StatisticConfig.dart';
 import 'package:gca/StatisticsModel.dart';
+import 'package:gca/RockPaperScissors.dart';
 import 'package:gca/TicTacToeScreen.dart';
 import 'package:provider/provider.dart';
 
 import 'ReactionGameScreen.dart';
+
+class GridDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
 
 class MainMenuScreen extends StatelessWidget {
   static const routeName = '/';
@@ -16,22 +24,120 @@ class MainMenuScreen extends StatelessWidget {
     return new Scaffold(
         appBar: AppBar(
           title: Center(child: Text('Games Collection')),
+          backgroundColor: Color.fromRGBO(100, 32, 40, 1),
         ),
-        body: ListView(
+        body: GridView.extent(
+          maxCrossAxisExtent: 150,
+          padding: const EdgeInsets.all(4),
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 4,
           children: [
             ElevatedButton(
-              child: Center(child: Text('Tic Tac Toe')),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.apps,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 10,
+                        child: Center(
+                            child: Text('Tic Tac Toe',
+                                textAlign: TextAlign.center))),
+                    Spacer(flex: 8),
+                  ]),
               onPressed: () => this.onTicTacToePressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
             ),
-            Divider(),
+            GridDivider(),
             ElevatedButton(
-              child: Center(child: Text('Connect Four')),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.blur_linear,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 10,
+                        child: Center(
+                            child: Text('Connect Four',
+                                textAlign: TextAlign.center))),
+                    Spacer(flex: 8),
+                  ]),
               onPressed: () => this.onConnectFourPressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
             ),
-            Divider(),
+            GridDivider(),
             ElevatedButton(
-              child: Center(child: Text('Reaction Game')),
-              onPressed: () => this.onF1GamePressed(context),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 11,
+                        child: Icon(
+                          Icons.hourglass_top,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 10,
+                        child: Center(
+                            child: Text('Reaction Game',
+                                textAlign: TextAlign.center))),
+                    Spacer(flex: 8),
+                  ]),
+              onPressed: () => this.onReactionGamePressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
+            ),
+            GridDivider(),
+            ElevatedButton(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.cut,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 11,
+                        child: Center(
+                            child: Text('Rock Paper Scissor',
+                                textAlign: TextAlign.center))),
+                    Spacer(flex: 8),
+                  ]),
+              onPressed: () => this.onRPSPressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
             ),
             ElevatedButton(onPressed: () => this.resetAllStats(context), child: Center(child: Text('Reset All', )),),
             ElevatedButton(onPressed: () => this.resetReactionGameStats(context), child: Center(child: Text('Reset Reaction Game Stats'))),
@@ -55,7 +161,11 @@ class MainMenuScreen extends StatelessWidget {
     Navigator.pushNamed(context, ConnectFourScreen.routeName);
   }
 
-  void onF1GamePressed(BuildContext context) {
+  void onReactionGamePressed(BuildContext context) {
     Navigator.pushNamed(context, ReactionGameScreen.routeName);
+  }
+
+  void onRPSPressed(BuildContext context) {
+    Navigator.pushNamed(context, RPSScreen.routeName);
   }
 }
