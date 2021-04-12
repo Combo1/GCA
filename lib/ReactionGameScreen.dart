@@ -39,7 +39,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
   int _counterSolved;
   int _pointsForSolving;
   //game info
-  static const int gameDuration = 10;
+  static const int gameDuration = 30;
   bool _isGameRunning = false;
 
 
