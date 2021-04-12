@@ -2,6 +2,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gca/StatisticConfig.dart';
 import 'package:gca/StatisticsModel.dart';
 import 'package:provider/provider.dart';
@@ -60,6 +61,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
     _controller.reset();
     _controller.forward();
     Provider.of<StatisticsModel>(context, listen: false).loadValues();  //ensures loading of stats in shared preferences
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);//force potrait mode in this mode
   }
 
   @override
@@ -116,6 +118,7 @@ class _ReactionGameScreenState extends State<ReactionGameScreen> with SingleTick
   void dispose(){
     _controller.stop();
     _controller.dispose();//Animation controller disposal must happen before super.dispose(); (source: https://stackoverflow.com/questions/58802223/flutter-ticker-must-be-disposed-before-calling-super-dispose)
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight,]);//force potrait mode in this mode
     super.dispose();
 
   }
