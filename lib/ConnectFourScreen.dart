@@ -21,20 +21,18 @@ class ConnectFourScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Connect Four',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Connect Four'),
-        ),
-        body: Center(
-          child: ListView(
-            children: [
-              ElevatedButton(child: Center(child: Text('PVP')), onPressed: () => this.onTicTacToePVPPressed(context), ),
-              Divider(),
-              ElevatedButton(child: Center(child: Text('Computer')), onPressed: () => this.onTicTacToePVCPressed(context), ),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Connect Four'),
+        backgroundColor: Color.fromRGBO(100, 32, 40, 1),
+      ),
+      body: Center(
+        child: ListView(
+          children: [
+            ElevatedButton(child: Center(child: Text('PVP')), onPressed: () => this.onTicTacToePVPPressed(context), ),
+            Divider(),
+            ElevatedButton(child: Center(child: Text('Computer')), onPressed: () => this.onTicTacToePVCPressed(context), ),
+          ],
         ),
       ),
     );
@@ -402,8 +400,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Vier gewinnt'),
-          centerTitle: true,
-          backgroundColor: Colors.blue[600],
+          backgroundColor: Color.fromRGBO(100, 32, 40, 1),
         ),
 
         backgroundColor: Colors.white,
