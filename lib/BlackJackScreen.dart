@@ -15,10 +15,12 @@ class _MyHomePageState extends State<BlackJackScreen> {
   BJCardDeck cardDeck = new BJCardDeck();
   int _hasAce = 0;
   bool _gameOver = false;
+  var _drawnCards = [];
 
   void _drawNextCard() {
     setState(() {
       BJCard nextCard = cardDeck.getNext();
+      _drawnCards.add(nextCard);
       if(nextCard.num == 11){
         _hasAce++;
       }
@@ -34,6 +36,36 @@ class _MyHomePageState extends State<BlackJackScreen> {
         }
       }
     });
+  }
+
+  String getCardsText(){
+    String s = '';
+    for(BJCard card in _drawnCards){
+      var suit = card.suit;
+
+      switch(suit){
+        case(BJCardSuits.clubs): s+='\u2663'; break;
+        case(BJCardSuits.diamonds): s+='\u2666'; break;
+        case(BJCardSuits.hearts): s+='\u2665'; break;
+        case(BJCardSuits.spades): s+='\u2660'; break;
+      }
+
+      int num = card.num;
+
+      if(num <= 10){
+        s += num.toString();
+      }
+      else{
+        switch(num){
+          case(11): s+='A'; break;
+          case(12): s+='J'; break;
+          case(13): s+='Q'; break;
+          case(14): s+='K'; break;
+        }
+      }
+
+      s+=' ';
+    }
   }
 
   String getScoreText(){
@@ -58,10 +90,11 @@ class _MyHomePageState extends State<BlackJackScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              getScoreText(),
+              getCardsText(),
+              style: Theme.of(context).textTheme.bodyText1,
             ),
             Text(
-              '$_counter',
+              getScoreText(),
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
