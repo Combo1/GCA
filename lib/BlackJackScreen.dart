@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class BlackJackScreen extends StatefulWidget {
   BlackJackScreen({Key key, this.title}) : super(key: key);
 
+  static const routeName = '/games/black-jack';
+
   final String title;
   BJCardDeck cardDeck = new BJCardDeck();
 

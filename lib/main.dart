@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gca/BlackJackScreen.dart';
 import 'package:gca/F1ReactionGameScreen.dart';
 import 'package:gca/MainMenuScreen.dart';
 import 'package:gca/StatisticsModel.dart';
@@ -124,6 +125,14 @@ class MyApp extends StatelessWidget {
               reverseDuration: Duration(milliseconds: 400),
             );
             break;
+          case BlackJackScreen.routeName:
+            return PageTransition(
+              child: BlackJackScreen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(microseconds: 400),
+              reverseDuration: Duration(microseconds: 400),
+            );
           default:
             return null;
         }
