@@ -24,7 +24,7 @@ enum _Direction{
   LEFT, RIGHT, UP, DOWN,
 }
 
-//TODO add score
+
 class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin{
 
   final int rowSize;
@@ -32,10 +32,12 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   int totalSize;
   bool isGameRunning = true;
 
+  //game stats
   List<int> values;
   List<int> valuesAfter;
   List<bool> isAppearing;
   List<int> targetID;
+  int _score = 0;
 
   bool _isInAnimation = false;
   bool _requireTextUpdate = false;
@@ -46,6 +48,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   double _offsetY = 0.0;
   String _resultSwipe = '';
   Random _random = Random();
+  //for the animation
   Animation2048State _currentState = Animation2048State.FIXED_POSITION;
 
 
@@ -218,7 +221,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   //later, check for game over event
   void moveTilesEvent(_Direction x){
     //if move did not change tiles, then mark move as invalid
-    Tuple3 nextState = getNextState(x, values);
+    Tuple4 nextState = getNextState(x, values);
     //check if moved, dont apply next state if state didn't change
     if(isSameState(values, nextState.item1)){
       print('no change occured, IsGameActive: $isGameRunning');
@@ -228,6 +231,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       //continue and apply event changes
       print('Target: ${nextState.item2}');
       targetID = nextState.item2;
+      _score += nextState.item4;
       //add new random tile to state
       Tuple2 stateAfterPlacement = placeRandomTile(nextState.item1);
       valuesAfter = stateAfterPlacement.item1;
@@ -247,10 +251,11 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
 
 
   //applies swipe on current state and returns changes
-  Tuple3 getNextState(_Direction x, List<int> currentState){
+  Tuple4 getNextState(_Direction x, List<int> currentState){
     List<int> stateAfter = List.filled(totalSize, 0);
     List<int> targetID = List.filled(totalSize, 0);
     List<bool> hasMerged = List.filled(totalSize, false);
+    int _scoreIncrease = 0;
     //TODO combine vertical and horizontal procedure
     if(x == _Direction.DOWN || x == _Direction.UP){
       //manipulate all entries in the same column
@@ -274,6 +279,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
               //mergable field and current value can merge, move indexMarker to next field
               print('Merge possible');
               stateAfter[toIndex(i, indexMarker)] = 2 * stateAfter[toIndex(i, indexMarker)]; //double value
+              _scoreIncrease += stateAfter[toIndex(i, indexMarker)]; //add value to scoreIncrease
               targetID[toIndex(i, l)] = toIndex(i, indexMarker);
               hasMerged[toIndex(i, indexMarker)] = true; //this value is a merged value
               indexMarker += step;
@@ -311,6 +317,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
               //mergable field and current value can merge, move indexMarker to next field
               //print('Merge possible');
               stateAfter[toIndex(indexMarker, l)] = 2 * stateAfter[toIndex(indexMarker, l)]; //double value
+              _scoreIncrease += stateAfter[toIndex(indexMarker, l)]; //add value to scoreIncrease
               targetID[toIndex(i, l)] = toIndex(indexMarker, l);
               hasMerged[toIndex(indexMarker, l)] = true; //this value is a merged value
               indexMarker += step;
@@ -324,7 +331,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
         }
       }
     }
-    return Tuple3(stateAfter, targetID, hasMerged);
+    return Tuple4(stateAfter, targetID, hasMerged, _scoreIncrease);
   }
 
   //compares two states on equal values
@@ -442,7 +449,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
           child: Column(children: [
           Padding(
             padding: EdgeInsets.only(bottom: 50, top: 50),
-            child: Text('Score: 0, $_resultSwipe,', style: TextStyle(fontSize: 40)),
+            child: Text('Score: $_score, $_resultSwipe,', style: TextStyle(fontSize: 40)),
           ),
             Text('$_currentState,', style: TextStyle(fontSize: 20)),
           FittedBox(alignment: Alignment.center, fit: BoxFit.fitWidth, child:
@@ -467,12 +474,10 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
 
 class Game2048CustomPainter extends CustomPainter{
   _Game2048State _currentState;
-  double _paddingTile = 5;
+  double _paddingTile = 3;
 
-  //TODO animate states APPEARING and MOVING
-  Game2048CustomPainter(this._currentState){
 
-  }
+  Game2048CustomPainter(this._currentState);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -482,10 +487,17 @@ class Game2048CustomPainter extends CustomPainter{
     //print('${size.width} ${size.height}');
     canvas.drawRect(Rect.fromLTRB(0, 0, size.width, size.height), pB);
     //calculate sizes
-    Paint pW = Paint();
-    pW..color = Colors.white;
+    
     double tileWidth = size.width / _currentState.rowSize;
-    //update text content
+    //draw grid
+    if(_currentState._currentState == Animation2048State.MOVING){
+      //draw grid seperately
+      for(int i = 0; i < _currentState.columnSize; i++) {
+        for (int l = 0; l < _currentState.rowSize; l++) {
+          canvas.drawRect(Rect.fromLTWH(toX(i, tileWidth), toY(l, tileWidth), tileWidth - 2 * _paddingTile, tileWidth - 2* _paddingTile), valueToColor(0));
+        }
+      }
+    }
 
 
 
@@ -493,7 +505,22 @@ class Game2048CustomPainter extends CustomPainter{
     for(int i = 0; i < _currentState.columnSize; i++){
       for(int l = 0; l < _currentState.rowSize; l++){
         //print('$i $l: ${toX(i, tileWidth)}, ${toY(l, tileWidth)}; $tileWidth}');
-        canvas.drawRect(Rect.fromLTWH(toX(i, tileWidth), toY(l, tileWidth), tileWidth - 2 * _paddingTile, tileWidth - 2* _paddingTile), pW);
+        if(_currentState._currentState == Animation2048State.MOVING){
+
+          //draw all values in motion
+          int curInd = _currentState.toIndex(i, l);
+          double xTemp = toXMoving(curInd, _currentState.targetID[curInd], 0, _currentState.animationMoving.value, tileWidth) + _paddingTile;
+          double yTemp = toYMoving(curInd, _currentState.targetID[curInd], 0, _currentState.animationMoving.value, tileWidth) + _paddingTile;
+          if(_currentState.values[curInd] != 0){
+            canvas.drawRect(Rect.fromLTWH(xTemp, yTemp, tileWidth - 2 * _paddingTile, tileWidth - 2* _paddingTile), valueToColor(_currentState.values[curInd]));
+          }
+        }else if(_currentState._currentState == Animation2048State.APPEARING){
+          canvas.drawRect(Rect.fromLTWH(toX(i, tileWidth), toY(l, tileWidth), tileWidth - 2 * _paddingTile, tileWidth - 2* _paddingTile), valueToColor(_currentState.values[_currentState.toIndex(i, l)]));
+        }else{
+          //draw value with color
+          canvas.drawRect(Rect.fromLTWH(toX(i, tileWidth), toY(l, tileWidth), tileWidth - 2 * _paddingTile, tileWidth - 2* _paddingTile), valueToColor(_currentState.values[_currentState.toIndex(i, l)]));
+        }
+
 
         //int curInd = _currentState.toIndex(i, l);
         //tp[curInd].paint(canvas, Offset((i+0.5) * tileWidth - tp[curInd].width/2, (l+0.5) * tileWidth - tp[curInd].height/2));
@@ -504,10 +531,15 @@ class Game2048CustomPainter extends CustomPainter{
 
   void updateTextPainterText(Size size, Canvas canvas, double tileWidth){
     List<TextPainter> _tp = List.filled(16, null);
+
+
     for(int i = 0; i < _currentState.columnSize; i++) {
       for (int l = 0; l < _currentState.rowSize; l++) {
         int curInd = _currentState.toIndex(i, l);
         int val = _currentState.values[curInd];
+        if(val == 0){
+          continue;
+        }
         String text = val == 0 ? '': val.toString();
         double _fontSize = 24;
         if(_currentState._currentState == Animation2048State.APPEARING && _currentState.isAppearing[curInd]){
@@ -524,8 +556,8 @@ class Game2048CustomPainter extends CustomPainter{
               (l + 0.5) * tileWidth - _tp[curInd].height / 2));
         }else{
           //moving state, move number
-          double xTemp = toXMoving(curInd, _currentState.targetID[curInd], _currentState.animationMoving.value, tileWidth);
-          double yTemp = toYMoving(curInd, _currentState.targetID[curInd], _currentState.animationMoving.value, tileWidth);
+          double xTemp = toXMoving(curInd, _currentState.targetID[curInd], 0.5, _currentState.animationMoving.value, tileWidth);
+          double yTemp = toYMoving(curInd, _currentState.targetID[curInd], 0.5, _currentState.animationMoving.value, tileWidth);
           _tp[curInd].paint(canvas, Offset(xTemp - _tp[curInd].width / 2,
               yTemp - _tp[curInd].height / 2));
         }
@@ -534,15 +566,62 @@ class Game2048CustomPainter extends CustomPainter{
     }
   }
 
-  double toXMoving(int indexSource, int indexTarget, double progress, double tileWidth){
-    double xSource = (_currentState.toIndexX(indexSource) + 0.5) * tileWidth;
-    double xTarget = (_currentState.toIndexX(indexTarget) + 0.5) * tileWidth;
+  Paint valueToColor(int value){
+    Color c;
+    switch(value) {
+      case 0:
+        c = Color.fromARGB(255, 240, 240, 240);
+        break;
+      case 2:
+        c = Color.fromARGB(255, 238, 228, 218);
+        break;
+      case 4:
+        c = Color.fromARGB(255, 237, 224, 200);
+        break;
+      case 8:
+        c = Color.fromARGB(255, 242, 177, 121);
+        break;
+      case 16:
+        c = Color.fromARGB(255, 245, 149, 99);
+        break;
+      case 32:
+        c = Color.fromARGB(255, 246, 124, 95);
+        break;
+      case 64:
+        c = Color.fromARGB(255, 246, 94, 59);
+        break;
+      case 128:
+        c = Color.fromARGB(255, 237, 207, 114);
+        break;
+      case 256:
+        c = Color.fromARGB(255, 237, 204, 94);
+        break;
+      case 512:
+        c = Color.fromARGB(255, 243, 215, 116);
+        break;
+      case 1024:
+        c = Color.fromARGB(255, 243, 215, 116);
+        break;
+      case 2048:
+        c = Color.fromARGB(255, 243, 215, 116);
+        break;
+      default:
+        c = Color.fromARGB(255, 237, 224, 200);
+    }
+    Paint p = Paint();
+    p..color = c;
+    return p;
+  }
+
+  double toXMoving(int indexSource, int indexTarget, double offset, double progress, double tileWidth){
+    double xSource = (_currentState.toIndexX(indexSource) + offset) * tileWidth;
+    double xTarget = (_currentState.toIndexX(indexTarget) + offset) * tileWidth;
     double diff = xTarget - xSource;
     return xSource + diff * progress;
   }
-  double toYMoving(int indexSource, int indexTarget, double progress, double tileWidth){
-    double ySource = (_currentState.toIndexY(indexSource) + 0.5) * tileWidth;
-    double yTarget = (_currentState.toIndexY(indexTarget) + 0.5) * tileWidth;
+  double toYMoving(int indexSource, int indexTarget, double offset, double progress, double tileWidth){
+    double ySource = (_currentState.toIndexY(indexSource) + offset) * tileWidth;
+    double yTarget = (_currentState.toIndexY(indexTarget) + offset) * tileWidth;
     double diff = yTarget - ySource;
     return ySource + diff * progress;
   }
@@ -557,7 +636,6 @@ class Game2048CustomPainter extends CustomPainter{
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    // TODO: implement shouldRepaint
     return _currentState._isInAnimation;
   }
 
