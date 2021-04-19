@@ -13,6 +13,8 @@ import 'package:tuple/tuple.dart';
 class Game2048Screen extends StatefulWidget{
   static const routeName = '/games/2048';
 
+
+
   @override
   State<StatefulWidget> createState() {
     return _Game2048State();
@@ -31,8 +33,8 @@ enum _Direction{
 
 class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin{
 
-  final int rowSize;
-  final int columnSize;
+  int rowSize;
+  int columnSize;
   int totalSize;
   bool isGameRunning = true;
 
@@ -42,18 +44,17 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   List<bool> isAppearing;
   List<int> targetID;
   int _score = 0;
+  int _movesPerformed = 0;
 
   bool _isInAnimation = false;
-  bool _requireTextUpdate = false;
 
   //for swiping
-  bool _isHorizontal = false;
   double _offsetX = 0.0;
   double _offsetY = 0.0;
-  String _resultSwipe = '';
+  //String _resultSwipe = '';
   Random _random = Random();
   //for the animation
-  Animation2048State _currentState = Animation2048State.FIXED_POSITION;
+  Animation2048State _animState = Animation2048State.FIXED_POSITION;
 
 
   //animation attributes for appearing animation
@@ -74,6 +75,17 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
     initGame();
   }
 
+  void resetGame(){
+    values = List.filled(totalSize, 0);
+    isAppearing = List.filled(totalSize, false);
+    valuesAfter = List.filled(totalSize, 0);
+    targetID = List.filled(totalSize, 0);
+    _score = 0;
+    _offsetX = 0.0;
+    _offsetY = 0.0;
+    _animState = Animation2048State.FIXED_POSITION;
+  }
+
 
   int toIndexX(int id){
     return id % rowSize;
@@ -90,7 +102,22 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   void initState() {
     super.initState();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);//force potrait mode in this mode
-
+    //init provider
+    Provider.of<StatisticsModel>(context, listen: false).loadValues();
+    String savegameData = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_GAME_2048, StatConst.KEY_SAVEGAME_1);
+    bool hasData = savegameData != "";
+    if(hasData) {
+      //savegame data found, overwrite initGame data()
+      List<String> strSplit = savegameData.split(";");
+      //columnSize, rowSize, score and values
+      columnSize = int.parse(strSplit[0]);
+      rowSize = int.parse(strSplit[1]);
+      totalSize = columnSize * rowSize;
+      _score = int.parse(strSplit[2]);
+      values = strSplit[3].split(',')
+          .map((e) => int.parse(e))
+          .toList();
+    }
     //animation appearing
     controllerAppearing = AnimationController(
       vsync: this,
@@ -128,19 +155,22 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
           controllerMoving.stop();
         }
       });
+
   }
 
   void saveState(){
     if(isGameRunning){
 
-      //save size, score and values
+      //save columnSize, rowSize, score and values
       String saveGame = "$columnSize;$rowSize;$_score;" + values.join(',');
       Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_SAVEGAME_1, saveGame);
     }
     //save moves done
     String movesDone = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED);
     //TODO update value here
-    Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED, movesDone);
+    int updatedMovesDone = int.parse(movesDone) + _movesPerformed;
+    Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED, "$updatedMovesDone");
+    _movesPerformed = 0;
     print('Saved state');
   }
 
@@ -152,54 +182,46 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight,]);//force potrait mode in this mode
     //save current game, if game is running
 
-    saveState();
     super.dispose();
   }
 
   void initGame(){
-    //choose two random fields, set both values to appearing
-    Tuple2 result = placeRandomTile(values, amount: 2);
-    values = result.item1;
-    isAppearing = result.item2;
-    _isInAnimation = true;
-    _currentState = Animation2048State.APPEARING;
-    _requireTextUpdate = true;
+      Tuple2 result = placeRandomTile(values, amount: 2);
+      values = result.item1;
+      isAppearing = result.item2;
+      _isInAnimation = true;
+      _animState = Animation2048State.APPEARING;
   }
 
   void startTimerAppearing(){
     controllerAppearing.reset();
     controllerAppearing.forward();
 
-    //print('start appearing');
     setState(() {
       _isInAnimation = true;
-      _currentState = Animation2048State.APPEARING;
+      _animState = Animation2048State.APPEARING;
     });
 
   }
 
   void stopTimerAppearing(){
-
-    //print('Stop appearing');
     setState(() {
       _isInAnimation = false;
-      _currentState = Animation2048State.FIXED_POSITION;
+      _animState = Animation2048State.FIXED_POSITION;
     });
   }
 
   void startTimerMoving(){
-    //print('start moving');
     controllerMoving.reset();
     controllerMoving.forward();
 
     setState(() {
       _isInAnimation = true;
-      _currentState = Animation2048State.MOVING;
+      _animState = Animation2048State.MOVING;
     });
   }
 
   void stopTimerMoving(){
-    //print('Stop Moving');
     setState(() {
       values = valuesAfter;
       _isInAnimation = false;
@@ -215,7 +237,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   Tuple2 placeRandomTile(List<int> currentState, {int amount = 1}){
     List<int> nextState = List.filled(totalSize, 0);
     List<bool> isAppearing = List.filled(totalSize, false);
-    print('State after moving: $currentState');
     List.copyRange(nextState, 0, currentState);
     if(amount <= 0){
       amount = 1;
@@ -238,7 +259,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       //remove chosen ID from list
       listValidID.removeAt(chosenIndexInList);
     }
-    print('Next State: $nextState');
     return Tuple2(nextState, isAppearing);
   }
 
@@ -249,14 +269,13 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
     Tuple4 nextState = getNextState(x, values);
     //check if moved, dont apply next state if state didn't change
     if(isSameState(values, nextState.item1)){
-      print('no change occured, IsGameActive: $isGameRunning');
+      //print('no change occured, IsGameActive: $isGameRunning');
       return;
     }else{
-      print('change has occured');
       //continue and apply event changes
-      print('Target: ${nextState.item2}');
       targetID = nextState.item2;
       _score += nextState.item4;
+      _movesPerformed++;
       //add new random tile to state
       Tuple2 stateAfterPlacement = placeRandomTile(nextState.item1);
       valuesAfter = stateAfterPlacement.item1;
@@ -266,8 +285,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       }
       //check possible game over state
       if(isGameOver(valuesAfter)){
-        //print('Game Over discovered');
-
         setGameOver();
       }
       startTimerMoving();
@@ -285,6 +302,11 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
     Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_AMOUNT_GAMES, "$games");
     Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_PERSONAL_BEST, "$highscore");
     Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_SAVEGAME_1, "");//delete existing savegame
+    //update moves done
+    String movesDone = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED);
+    int updatedMovesDone = int.parse(movesDone) + _movesPerformed;
+    Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED, "$updatedMovesDone");
+    _movesPerformed = 0;
   }
 
 
@@ -315,7 +337,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
               targetID[toIndex(i, l)] = toIndex(i, indexMarker); //remember movement l --> indexMarker
             }else if(stateAfter[toIndex(i, indexMarker)] == currentState[toIndex(i, l)]){
               //mergable field and current value can merge, move indexMarker to next field
-              print('Merge possible');
               stateAfter[toIndex(i, indexMarker)] = 2 * stateAfter[toIndex(i, indexMarker)]; //double value
               _scoreIncrease += stateAfter[toIndex(i, indexMarker)]; //add value to scoreIncrease
               targetID[toIndex(i, l)] = toIndex(i, indexMarker);
@@ -353,7 +374,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
               targetID[toIndex(i, l)] = toIndex(indexMarker, l); //remember movement l --> indexMarker
             }else if(stateAfter[toIndex(indexMarker, l)] == currentState[toIndex(i, l)]){
               //mergable field and current value can merge, move indexMarker to next field
-              //print('Merge possible');
               stateAfter[toIndex(indexMarker, l)] = 2 * stateAfter[toIndex(indexMarker, l)]; //double value
               _scoreIncrease += stateAfter[toIndex(indexMarker, l)]; //add value to scoreIncrease
               targetID[toIndex(i, l)] = toIndex(indexMarker, l);
@@ -375,7 +395,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   //compares two states on equal values
   bool isSameState(List<int> currentState, List<int> nextState){
     if(currentState.length != nextState.length){
-      print('not same length');
       return false;
     }else{
       for(int i = 0; i < currentState.length; i++){
@@ -397,7 +416,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
         for (int i = 1; i < columnSize; i++) {
           if(state[toIndex(i, l)] == val){
             //same value, return false
-            //print('two same values discovered (same row): $i, $l');
             return false;
           }else{
             val = state[toIndex(i, l)];
@@ -409,7 +427,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
         int val = state[toIndex(i, 0)];//first value in column
         for(int l = 1; l < rowSize; l++) {
           if(state[toIndex(i, l)] == val){
-            //print('two same values discovered (same column): $i, $l');
             return false;//same value, return false
           }else{
             val = state[toIndex(i, l)];
@@ -418,7 +435,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       }
       return true;
     }else{
-      //print('Zero discovered');
       return false;//at least one empty field available
     }
 
@@ -427,35 +443,23 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   void onHorizontalDragEnd(DragEndDetails e){
     if(_offsetX > 0){
       //swipe right
-      setState(() {
-        _resultSwipe = 'right';
-      });
       moveTilesEvent(_Direction.RIGHT);
     }else if(_offsetX < 0){
-      setState(() {
-        _resultSwipe = 'left';
-      });
+      //swipe left
       moveTilesEvent(_Direction.LEFT);
     }
 
   }
   void onVerticalDragEnd(DragEndDetails e){
     if(_offsetY > 0){
-      //swipe right
-      setState(() {
-        _resultSwipe = 'bottom';
-        moveTilesEvent(_Direction.DOWN);
-      });
+      //swipe down
+      moveTilesEvent(_Direction.DOWN);
     }else if(_offsetY < 0){
-      setState(() {
-        _resultSwipe = 'up';
-        moveTilesEvent(_Direction.UP);
-      });
+      moveTilesEvent(_Direction.UP);
     }
   }
 
   void onVerticalDragStart(DragStartDetails e){
-    _isHorizontal = false;
     _offsetX = 0;
     _offsetY = 0;
   }
@@ -466,7 +470,6 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   }
 
   void onHorizontalDragStart(DragStartDetails e){
-    _isHorizontal = true;
     _offsetX = 0;
     _offsetY = 0;
   }
@@ -497,10 +500,12 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
             child: Column(
               children: [
               Padding(
-                padding: EdgeInsets.only(bottom: 50, top: 50),
-                child: Text('Score: $_score, $_resultSwipe,', style: TextStyle(fontSize: 40)),
+                padding: EdgeInsets.only(bottom: 20, top: 40),
+                child: Text('Score: $_score', style: TextStyle(fontSize: 40)),
               ),
-              Text('$_currentState,', style: TextStyle(fontSize: 20)),
+              _buildGameOverText(),
+              //Text('$_resultSwipe', style: TextStyle(fontSize: 20)),
+              //Text('$_currentState,', style: TextStyle(fontSize: 20)),
               FittedBox(alignment: Alignment.center, fit: BoxFit.fitWidth, child:
                 SizedBox.fromSize(
                     size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.width),
@@ -517,8 +522,17 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       ),
     );
   }
+
+  Widget _buildGameOverText(){
+    if(isGameRunning){
+      return Container();
+    }else{
+      return Padding(padding: EdgeInsets.only(top: 5, bottom: 10), child: Text('Game Over', style: TextStyle(fontSize: 40, color: Colors.red.shade700)));
+    }
+  }
+
   Widget _buildBottomButtons(){
-    if(isGameRunning && false){
+    if(isGameRunning){
       return Container();
     }
     return
@@ -583,15 +597,16 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   }
 
   void onRestartPressed(){
-
+    resetGame();
+    setState(() {
+      isGameRunning = true;
+    });
+    initGame();
   }
 
   void onExitPressed(){
     saveState();
-  }
-
-  void onSavePressed(){
-
+    Navigator.pop(context);
   }
 
 
@@ -611,13 +626,12 @@ class Game2048CustomPainter extends CustomPainter{
 
     Paint pB = Paint();
     pB..color = Colors.black;
-    //print('${size.width} ${size.height}');
     canvas.drawRect(Rect.fromLTRB(0, 0, size.width, size.height), pB);
     //calculate sizes
     
     double tileWidth = size.width / _currentState.rowSize;
     //draw grid
-    if(_currentState._currentState == Animation2048State.MOVING){
+    if(_currentState._animState == Animation2048State.MOVING){
       //draw grid seperately
       for(int i = 0; i < _currentState.columnSize; i++) {
         for (int l = 0; l < _currentState.rowSize; l++) {
@@ -631,8 +645,7 @@ class Game2048CustomPainter extends CustomPainter{
     //update area
     for(int i = 0; i < _currentState.columnSize; i++){
       for(int l = 0; l < _currentState.rowSize; l++){
-        //print('$i $l: ${toX(i, tileWidth)}, ${toY(l, tileWidth)}; $tileWidth}');
-        if(_currentState._currentState == Animation2048State.MOVING){
+        if(_currentState._animState == Animation2048State.MOVING){
 
           //draw all values in motion
           int curInd = _currentState.toIndex(i, l);
@@ -641,7 +654,7 @@ class Game2048CustomPainter extends CustomPainter{
           if(_currentState.values[curInd] != 0){
             canvas.drawRect(Rect.fromLTWH(xTemp, yTemp, tileWidth - 2 * _paddingTile, tileWidth - 2* _paddingTile), valueToColor(_currentState.values[curInd]));
           }
-        }else if(_currentState._currentState == Animation2048State.APPEARING){
+        }else if(_currentState._animState == Animation2048State.APPEARING){
           canvas.drawRect(Rect.fromLTWH(toX(i, tileWidth), toY(l, tileWidth), tileWidth - 2 * _paddingTile, tileWidth - 2* _paddingTile), valueToColor(_currentState.values[_currentState.toIndex(i, l)]));
         }else{
           //draw value with color
@@ -669,7 +682,7 @@ class Game2048CustomPainter extends CustomPainter{
         }
         String text = val == 0 ? '': val.toString();
         double _fontSize = 24;
-        if(_currentState._currentState == Animation2048State.APPEARING && _currentState.isAppearing[curInd]){
+        if(_currentState._animState == Animation2048State.APPEARING && _currentState.isAppearing[curInd]){
           _fontSize = 24 * _currentState.animationAppearing.value;
         }
           TextSpan span = TextSpan(text: '$text',
@@ -678,7 +691,7 @@ class Game2048CustomPainter extends CustomPainter{
             textAlign: TextAlign.center,
             textDirection: TextDirection.ltr,);
           _tp[curInd].layout(minWidth: 0, maxWidth: size.width);
-        if(_currentState._currentState != Animation2048State.MOVING){
+        if(_currentState._animState != Animation2048State.MOVING){
           _tp[curInd].paint(canvas, Offset((i + 0.5) * tileWidth - _tp[curInd].width / 2,
               (l + 0.5) * tileWidth - _tp[curInd].height / 2));
         }else{
