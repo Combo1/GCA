@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gca/2048Screen.dart';
+import 'package:gca/BlackJackScreen.dart';
 import 'package:gca/ConnectFourScreen.dart';
 import 'package:gca/StatisticConfig.dart';
 import 'package:gca/StatisticsModel.dart';
@@ -168,10 +169,37 @@ class MainMenuScreen extends StatelessWidget {
                 onPrimary: Colors.white, // foreground
               ),
             ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Spacer(flex: 8),
+                  Expanded(
+                    flex: 10,
+                    child: Icon(
+                      //TODO: better icon
+                      Icons.weekend_rounded,
+                      color: Colors.white,
+                      size: 40.0,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 11,
+                    child: Center(
+                      child: Text('Black Jack',
+                          textAlign: TextAlign.center))),
+                    Spacer(flex: 8),
+                    ]),
+              onPressed: () => this.onBJPressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900],
+                onPrimary: Colors.white,
+              ),
+                  )
+                ],
+              ),
+            );
             //ElevatedButton(onPressed: () => this.resetAllStats(context), child: Center(child: Text('Reset All', )),),
             //ElevatedButton(onPressed: () => this.resetReactionGameStats(context), child: Center(child: Text('Reset Reaction Game Stats'))),
-          ],
-        ));
   }
 
   void resetAllStats(BuildContext context){
@@ -200,5 +228,8 @@ class MainMenuScreen extends StatelessWidget {
 
   void on2048Pressed(BuildContext context){
     Navigator.pushNamed(context, Game2048OverviewScreen.routeName);
+  }
+  void onBJPressed(BuildContext context) {
+    Navigator.pushNamed(context, BlackJackScreen.routeName);
   }
 }
