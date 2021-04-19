@@ -142,6 +142,7 @@ class MyApp extends StatelessWidget {
               settings: settings,
               duration: Duration(milliseconds: 400),
               reverseDuration: Duration(milliseconds: 400),
+            );
           case BlackJackScreen.routeName:
             return PageTransition(
               child: BlackJackScreen(),

@@ -169,6 +169,9 @@ class MainMenuScreen extends StatelessWidget {
                 onPrimary: Colors.white, // foreground
               ),
             ),
+            GridDivider(),
+            ElevatedButton(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -194,7 +197,7 @@ class MainMenuScreen extends StatelessWidget {
                 primary: Colors.green[900],
                 onPrimary: Colors.white,
               ),
-                  )
+              )
                 ],
               ),
             );
