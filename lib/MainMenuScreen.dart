@@ -140,6 +140,7 @@ class MainMenuScreen extends StatelessWidget {
                 onPrimary: Colors.white, // foreground
               ),
             ),
+            GridDivider(),
             ElevatedButton(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
