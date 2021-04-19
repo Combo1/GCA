@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gca/2048Screen.dart';
 import 'package:gca/BlackJackScreen.dart';
 import 'package:gca/ConnectFourScreen.dart';
 import 'package:gca/StatisticConfig.dart';
@@ -8,6 +9,7 @@ import 'package:gca/RockPaperScissors.dart';
 import 'package:gca/TicTacToeScreen.dart';
 import 'package:provider/provider.dart';
 
+import '2048OverviewScreen.dart';
 import 'ReactionGameScreen.dart';
 
 class GridDivider extends StatelessWidget {
@@ -143,6 +145,33 @@ class MainMenuScreen extends StatelessWidget {
             GridDivider(),
             ElevatedButton(
               child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(flex: 8),
+                    Expanded(
+                        flex: 10,
+                        child: Icon(
+                          Icons.wb_incandescent_outlined,
+                          color: Colors.white,
+                          size: 40.0,
+                        )),
+                    Expanded(
+                        flex: 11,
+                        child: Center(
+                            child: Text('2048',
+                                textAlign: TextAlign.center))),
+                    Spacer(flex: 8),
+                  ]),
+              onPressed: () => this.on2048Pressed(context),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
+            ),
+            GridDivider(),
+            ElevatedButton(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -168,7 +197,7 @@ class MainMenuScreen extends StatelessWidget {
                 primary: Colors.green[900],
                 onPrimary: Colors.white,
               ),
-                  )
+              )
                 ],
               ),
             );
@@ -200,6 +229,9 @@ class MainMenuScreen extends StatelessWidget {
     Navigator.pushNamed(context, RPSScreen.routeName);
   }
 
+  void on2048Pressed(BuildContext context){
+    Navigator.pushNamed(context, Game2048OverviewScreen.routeName);
+  }
   void onBJPressed(BuildContext context) {
     Navigator.pushNamed(context, BlackJackScreen.routeName);
   }
