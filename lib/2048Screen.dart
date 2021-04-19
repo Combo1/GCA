@@ -3,7 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:gca/StatisticConfig.dart';
+import 'package:gca/StatisticsModel.dart';
+import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 class Game2048Screen extends StatefulWidget{
@@ -126,10 +130,29 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       });
   }
 
+  void saveState(){
+    if(isGameRunning){
+
+      //save size, score and values
+      String saveGame = "$columnSize;$rowSize;$_score;" + values.join(',');
+      Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_SAVEGAME_1, saveGame);
+    }
+    //save moves done
+    String movesDone = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED);
+    //TODO update value here
+    Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED, movesDone);
+    print('Saved state');
+  }
+
 
   @override
   void dispose() {
+    controllerAppearing.dispose();
+    controllerMoving.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight,]);//force potrait mode in this mode
+    //save current game, if game is running
+
+    saveState();
     super.dispose();
   }
 
@@ -146,19 +169,20 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   void startTimerAppearing(){
     controllerAppearing.reset();
     controllerAppearing.forward();
-    _isInAnimation = true;
+
     //print('start appearing');
     setState(() {
-
+      _isInAnimation = true;
       _currentState = Animation2048State.APPEARING;
     });
 
   }
 
   void stopTimerAppearing(){
-    _isInAnimation = false;
+
     //print('Stop appearing');
     setState(() {
+      _isInAnimation = false;
       _currentState = Animation2048State.FIXED_POSITION;
     });
   }
@@ -167,9 +191,9 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
     //print('start moving');
     controllerMoving.reset();
     controllerMoving.forward();
-    _isInAnimation = true;
-    setState(() {
 
+    setState(() {
+      _isInAnimation = true;
       _currentState = Animation2048State.MOVING;
     });
   }
@@ -178,10 +202,11 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
     //print('Stop Moving');
     setState(() {
       values = valuesAfter;
+      _isInAnimation = false;
     });
 
     startTimerAppearing();
-    _isInAnimation = false;
+
 
   }
 
@@ -241,12 +266,25 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       }
       //check possible game over state
       if(isGameOver(valuesAfter)){
-        print('Game Over discovered');
-        isGameRunning = false;
+        //print('Game Over discovered');
+
+        setGameOver();
       }
       startTimerMoving();
-
     }
+  }
+
+  void setGameOver(){
+    isGameRunning = false;
+    //save stats
+    String strGames = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_GAME_2048, StatConst.KEY_AMOUNT_GAMES);
+    String strHighscore = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_GAME_2048, StatConst.KEY_PERSONAL_BEST);
+    int games = int.parse(strGames) + 1;
+    //TODO set flag for new record here
+    int highscore = max(int.parse(strHighscore), _score);
+    Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_AMOUNT_GAMES, "$games");
+    Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_PERSONAL_BEST, "$highscore");
+    Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_SAVEGAME_1, "");//delete existing savegame
   }
 
 
@@ -391,13 +429,13 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       //swipe right
       setState(() {
         _resultSwipe = 'right';
-        moveTilesEvent(_Direction.RIGHT);
       });
+      moveTilesEvent(_Direction.RIGHT);
     }else if(_offsetX < 0){
       setState(() {
         _resultSwipe = 'left';
-        moveTilesEvent(_Direction.LEFT);
       });
+      moveTilesEvent(_Direction.LEFT);
     }
 
   }
@@ -437,8 +475,18 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return
+      WillPopScope(
+        onWillPop: (){
+          //method saves progress when pressing the back button and returns to the previous screen
+          this.saveState();
+          Navigator.pop(context);
+          return Future.value(false);
+          },
+        child:
       Scaffold(
-        body: SafeArea(child:
+        body: Container(
+          color: Colors.amber,
+          child: SafeArea(child:
         GestureDetector(
           onHorizontalDragEnd: (e) => this.onHorizontalDragEnd(e),
           onVerticalDragEnd: (e) => this.onVerticalDragEnd(e),
@@ -446,26 +494,105 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
           onVerticalDragUpdate: (e) => this.onDragUpdate('Vertical: ', e),
           onHorizontalDragStart: (e) => this.onHorizontalDragStart(e),
           onVerticalDragStart: (e) => this.onVerticalDragStart(e),
-          child: Column(children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 50, top: 50),
-            child: Text('Score: $_score, $_resultSwipe,', style: TextStyle(fontSize: 40)),
-          ),
-            Text('$_currentState,', style: TextStyle(fontSize: 20)),
-          FittedBox(alignment: Alignment.center, fit: BoxFit.fitWidth, child:
-            SizedBox.fromSize(
-                size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.width),
-                child: CustomPaint(painter: Game2048CustomPainter(this)
+            child: Column(
+              children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 50, top: 50),
+                child: Text('Score: $_score, $_resultSwipe,', style: TextStyle(fontSize: 40)),
+              ),
+              Text('$_currentState,', style: TextStyle(fontSize: 20)),
+              FittedBox(alignment: Alignment.center, fit: BoxFit.fitWidth, child:
+                SizedBox.fromSize(
+                    size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.width),
+                    child: CustomPaint(painter: Game2048CustomPainter(this)
+                    ),
                 ),
-            ),
+              ),
+              _buildBottomButtons(),
+            ],
           ),
-        ],
-        ),
+          ),
+      ),
       ),
       ),
     );
   }
+  Widget _buildBottomButtons(){
+    if(isGameRunning && false){
+      return Container();
+    }
+    return
+      Padding(padding: EdgeInsets.only(top: 10, left: 10, right: 10), child:
+      Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+          child: Padding(padding: EdgeInsets.all(2),
+            child: ElevatedButton(
+              child: Padding(padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                        Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 40.0,
+                        ),
+                            SizedBox(width: 10),
+                            Text('Exit', textAlign: TextAlign.center),
+                ]),),
+                onPressed: () => this.onExitPressed(),
+                style: ElevatedButton.styleFrom(
+                primary: Colors.redAccent.shade700, // background
+                onPrimary: Colors.white, // foreground
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Padding(padding: EdgeInsets.all(2),
+            child: ElevatedButton(
+              child: Padding(padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('Restart', textAlign: TextAlign.center),
+                      SizedBox(width: 10),
+                      Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 40.0,
+                      ),
 
+
+                    ]),),
+              onPressed: () => this.onRestartPressed(),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green[900], // background
+                onPrimary: Colors.white, // foreground
+              ),
+            ),
+          ),
+        ),
+
+    ],
+    ),);
+  }
+
+  void onRestartPressed(){
+
+  }
+
+  void onExitPressed(){
+    saveState();
+  }
+
+  void onSavePressed(){
+
+  }
 
 
 }
@@ -640,3 +767,5 @@ class Game2048CustomPainter extends CustomPainter{
   }
 
 }
+
+

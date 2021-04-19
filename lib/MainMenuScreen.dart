@@ -8,6 +8,7 @@ import 'package:gca/RockPaperScissors.dart';
 import 'package:gca/TicTacToeScreen.dart';
 import 'package:provider/provider.dart';
 
+import '2048OverviewScreen.dart';
 import 'ReactionGameScreen.dart';
 
 class GridDivider extends StatelessWidget {
@@ -150,7 +151,7 @@ class MainMenuScreen extends StatelessWidget {
                     Expanded(
                         flex: 10,
                         child: Icon(
-                          Icons.cut,
+                          Icons.wb_incandescent_outlined,
                           color: Colors.white,
                           size: 40.0,
                         )),
@@ -198,6 +199,6 @@ class MainMenuScreen extends StatelessWidget {
   }
 
   void on2048Pressed(BuildContext context){
-    Navigator.pushNamed(context, Game2048Screen.routeName);
+    Navigator.pushNamed(context, Game2048OverviewScreen.routeName);
   }
 }
