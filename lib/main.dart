@@ -6,6 +6,7 @@ import 'package:gca/RockPaperScissors.dart';
 import 'package:gca/TicTacToeScreen.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '2048Screen.dart';
 import 'ConnectFourScreen.dart';
 import 'ReactionGameScreen.dart';
 
@@ -124,6 +125,14 @@ class MyApp extends StatelessWidget {
               reverseDuration: Duration(milliseconds: 400),
             );
             break;
+          case Game2048Screen.routeName:
+            return PageTransition(
+              child: Game2048Screen(),
+              type: PageTransitionType.fade,
+              settings: settings,
+              duration: Duration(milliseconds: 400),
+              reverseDuration: Duration(milliseconds: 400),
+            );
           default:
             return null;
         }
