@@ -43,28 +43,33 @@ class _RPSStandardState extends State<RPSStandard> {
 
   void _handleButtonPressed(int sign) {
     if (_gameState == GameState.start) {
-      setState(() {
-        _buttonChoiceActivationList[sign] = true;
-        _botChoice = _random.nextInt(3);
-        if (_botChoice == sign)
-          _gameState = GameState.draw;
-        else if (_botChoice > sign) {
-          if (_botChoice % 2 == sign % 2) {
-            _winsBot++;
-            _gameState = GameState.lose;
+      Future.delayed(const Duration(milliseconds: 400), () {
+        setState(() {
+          _buttonChoiceActivationList[sign] = true;
+          _botChoice = _random.nextInt(3);
+          if (_botChoice == sign)
+            _gameState = GameState.draw;
+          else if (_botChoice > sign) {
+            if (_botChoice % 2 == sign % 2) {
+              _winsBot++;
+              _gameState = GameState.lose;
+            } else {
+              _winsHuman++;
+              _gameState = GameState.win;
+            }
           } else {
-            _winsHuman++;
-            _gameState = GameState.win;
+            if (_botChoice % 2 == sign % 2) {
+              _winsHuman++;
+              _gameState = GameState.win;
+            } else {
+              _winsBot++;
+              _gameState = GameState.lose;
+            }
           }
-        } else {
-          if (_botChoice % 2 == sign % 2) {
-            _winsHuman++;
-            _gameState = GameState.win;
-          } else {
-            _winsBot++;
-            _gameState = GameState.lose;
-          }
-        }
+        });
+      });
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        _gameStatePressed();
       });
     }
   }
