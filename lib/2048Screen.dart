@@ -158,16 +158,17 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
 
   }
 
+
+  //Save game progress
   void saveState(){
     if(isGameRunning){
-
       //save columnSize, rowSize, score and values
       String saveGame = "$columnSize;$rowSize;$_score;" + values.join(',');
       Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_SAVEGAME_1, saveGame);
     }
     //save moves done
     String movesDone = Provider.of<StatisticsModel>(context, listen: false).getValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED);
-    //TODO update value here
+
     int updatedMovesDone = int.parse(movesDone) + _movesPerformed;
     Provider.of<StatisticsModel>(context, listen: false).setValue(StatConst.KEY_GAME_2048, StatConst.KEY_MOVES_PERFORMED, "$updatedMovesDone");
     _movesPerformed = 0;
@@ -226,7 +227,10 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
       values = valuesAfter;
       _isInAnimation = false;
     });
-
+    //save current game progress
+    if(isGameRunning){
+      saveState();
+    }
     startTimerAppearing();
 
 
@@ -291,6 +295,8 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
     }
   }
 
+  //Update strings for final stats on the screen and game stats in the key-value store
+  //Delete existing savegame
   void setGameOver(){
     isGameRunning = false;
     //save stats
@@ -605,7 +611,7 @@ class _Game2048State extends State<Game2048Screen> with TickerProviderStateMixin
   }
 
   void onExitPressed(){
-    saveState();
+    saveState(); //save game progress
     Navigator.pop(context);
   }
 
