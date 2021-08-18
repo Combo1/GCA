@@ -18,7 +18,7 @@ class GridDivider extends StatelessWidget {
     return Container();
   }
 }
-
+//TODO Save after every move, prevent kill app reloading
 class MainMenuScreen extends StatelessWidget {
   static const routeName = '/';
 
